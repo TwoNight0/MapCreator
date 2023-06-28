@@ -4,16 +4,19 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+/// <summary>
+/// 위치정보와 레이어,태그 정보를 가지고있어서 제이스데이터를 바탕으로 다른 프리팹으로도 같은형태의 맵을 만들수있음
+/// </summary>
 [System.Serializable]
-public class MapData{
-    Vector3 position;
-    private int objNum; //개별 오브젝트넘버
-    private int LayerNum;
-    private string tagName;
+public class MapData : MonoBehaviour
+{
+    public Vector3 pos;
+    public int LayerNum = 6;
+    public string tagName = "";
     
     public void printData()
     {
-        Debug.Log("Position : " + position);
+        Debug.Log("Position : " + pos);
         Debug.Log("TagName : " + tagName);
         Debug.Log("LayerNum : " + LayerNum);
     }
@@ -27,6 +30,13 @@ public class MapCreate : MonoBehaviour
     [SerializeField, Tooltip("벽에 사용될 프리팹")] private List<GameObject> objPrefabList_Wall;
     [Space(20)]
 
+    //최상위(root)
+    private GameObject map;
+    //상위 노드
+    private GameObject floor;
+    private GameObject wall;
+    private GameObject deco;
+
 
     //제이슨으로 저장될리스트
     private List<MapData> mapFloor;
@@ -34,11 +44,9 @@ public class MapCreate : MonoBehaviour
     private List<MapData> mapDeco;
 
 
-
     [Header("타일 사이즈")] //타일 사이즈
-    [SerializeField, Tooltip("타일의 가로")] int TileSizeX;
-    [SerializeField, Tooltip("타일의 높이")] int TileSizeY; //wall만들때 사용
-    [SerializeField, Tooltip("타일의 세로")] int TileSizeZ;
+    [SerializeField, Tooltip("타일의 가로, 1이상이여야함")] int TileSizeX;
+    [SerializeField, Tooltip("타일의 세로, 1이상이여야함")] int TileSizeZ;
     private int totalPixel;
     private int prefabSize; //프리팹하나의 크기 
     private int tempZ;
@@ -54,11 +62,17 @@ public class MapCreate : MonoBehaviour
     private void Awake()
     {
         //최상위 오브젝트
-        GameObject map = new GameObject();
+        map = new GameObject();
         //상위 오브젝트들(부모)
-        GameObject floor = new GameObject(); //바닥의부모
-        GameObject wall = new GameObject(); //벽들의 부모
-        GameObject deco = new GameObject(); //장식품들의 부모
+        floor = new GameObject(); //바닥의부모
+        wall = new GameObject(); //벽들의 부모
+        deco = new GameObject(); //장식품들의 부모
+
+
+        //리스트 할당(제이슨 저장용)
+        mapFloor = new List<MapData>();
+        mapWall = new List<MapData>();
+        mapDeco = new List<MapData>();
 
         //이름할당
         map.name = "Map";
@@ -66,7 +80,7 @@ public class MapCreate : MonoBehaviour
         wall.name = "Wall";
         deco.name = "deco";
 
-        //위초기화
+        //위치 초기화
         map.transform.position = Vector3.zero;
         floor.transform.position = Vector3.zero;
         wall.transform.position = Vector3.zero;
@@ -85,20 +99,23 @@ public class MapCreate : MonoBehaviour
 
     void Start()
     {
-        SaveMap(mapFloor, mapWall, mapDeco);
-        Debug.Log(mapFloor);
-        Debug.Log(Application.dataPath);
+        createWallTile();
+
+
     }
 
     void Update()
     {
-
+        
     }
 
-    private void SaveMap(List<MapData> _mapFloor, List<MapData> _mapWall, List<MapData> _mapDeco){
+    public void SaveMap(List<MapData> _mapFloor, List<MapData> _mapWall, List<MapData> _mapDeco){
+        //직렬화
         string mapFloor = JsonConvert.SerializeObject(_mapFloor);
-        string mapWall = JsonConvert.SerializeObject(_mapFloor);
-        string mapDeco = JsonConvert.SerializeObject(_mapFloor);
+        string mapWall = JsonConvert.SerializeObject(_mapWall);
+        string mapDeco = JsonConvert.SerializeObject(_mapDeco);
+
+        //제이슨 저장
         File.WriteAllText(Application.dataPath + "/MapJsonFolder/Map.json", mapFloor);
         File.WriteAllText(Application.dataPath + "/MapJsonFolder/Map.json", mapWall);
         File.WriteAllText(Application.dataPath + "/MapJsonFolder/Map.json", mapDeco);
@@ -107,10 +124,9 @@ public class MapCreate : MonoBehaviour
         //Application.streamingAssetsPath;
     }
 
-  
     //Start에서 로드된걸 다시 다만들어야함 
-    private List<MapData> LoadMap() {
-        //예외처리
+    public List<MapData> LoadMap() {
+        //예외처리 없으면 만듬
         //if ((File.ReadAllText(Application.dataPath + "/TestJson.json")) == null){
         //    return;
         //}
@@ -120,11 +136,9 @@ public class MapCreate : MonoBehaviour
     }
 
     /// <summary>
-    /// 바닥타일을 원하는 가로 x 세로 만큼 만들어주는 타일
+    /// 입력한 가로 x 세로 만큼 타일을 만들어주는 메서드
     /// </summary>
-    /// <param name="_parent"></param>
-    //이오브젝트의 사이즈즌 4 정도의 간격을 계속줘야함 총타일 % z == 0 z변경해서 위로올리자
-    private void createFloorTile(GameObject _parent)
+    public void createFloorTile()
     {
         //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
         MeshRenderer ren = objPrefabList_Floor[0].GetComponent<MeshRenderer>();
@@ -136,46 +150,156 @@ public class MapCreate : MonoBehaviour
         //총깔아야하는 프리팹 수
         totalPixel = TileSizeX * TileSizeZ;
 
-        //상위오브젝트
+        //Floor -> 상위 노드(this) -> 111
+        GameObject subFloor = new GameObject();
+        subFloor.transform.parent = floor.transform;
+        subFloor.name = "subFloor";
+
         for (int i = 0; i< totalPixel; i++)
         {
+            //z축으로 늘리기위함
             if(i % TileSizeZ == 0)
             {
                 tempZ += prefabSize;
             }
-            Vector3 Vfloor = new Vector3( i * prefabSize, 0, tempZ);
-            //오브젝트생성(프리팹, 벡터(i * 4, 0 , ), 부모) -> 위치, 부모, 해결
-            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], _parent.transform);
-            MapData data = obj.GetComponent<MapData>();
 
+            //position 설정
+            Vector3 Vfloor = new Vector3( i * prefabSize - ((tempZ - prefabSize)* TileSizeZ), 0, tempZ-prefabSize);
+            //Debug.Log(Vfloor);
+
+            //오브젝트생성
+            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subFloor.transform);
+           
             //위치지정
             obj.transform.position = Vfloor;
+
+            //MapData 넣기
+            obj.AddComponent<MapData>();
+
+            //MapData 가져오기
+            MapData data = obj.GetComponent<MapData>();
+            data.pos = Vfloor;
+
+            //테스트중
+            //Debug.Log(data.pos);
+            //string test = JsonConvert.SerializeObject(data)
+
+            //string test = JsonConvert.SerializeObject(data, Formatting.None,
+            //            new JsonSerializerSettings()
+            //            {
+            //                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            //            });
+            //File.WriteAllText(Application.dataPath + "/MapJsonFolder/Map.json", test);
 
             //리스트에 추가
             mapFloor.Add(data);
 
-            //오브젝트구분 objNum++
-            
+
+
+            //오브젝트구분 
+            obj.name = "floor"+ objNum.ToString();
+            objNum++;
 
             //태그 지정
-
+            obj.tag = "Ground";
+            data.tagName = "Ground";
 
             //레이어 지정
+            obj.layer = 6;
+            data.LayerNum = 6;
         }
         //콜라이더 만들기
+        subFloor.AddComponent<BoxCollider>();
 
-        //콜라이더 크기 및 위치 수정
+        //콜라이더 가져오기
+        BoxCollider Cbox = subFloor.GetComponent<BoxCollider>();
+
+        //콜라이더 사이즈 조절
+        Cbox.size = new Vector3(TileSizeZ * prefabSize, 0, TileSizeX * prefabSize);
+
+        //콜라이더 위치 조절
+        //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
+        Cbox.center = new Vector3(((TileSizeZ * prefabSize / 2) - (prefabSize / 2)), 
+            0, 
+            ((TileSizeX * prefabSize / 2) - (prefabSize / 2)));
+
+        //다시 사용하기 위한 초기화
+        TileSizeX = 0;
+        TileSizeZ = 0;
+
     }
 
-    private void createWallTile(GameObject _parent)
+    /// <summary>
+    /// 입력한 가로에따른 타일을 만들어주는 메서드
+    /// </summary>
+    public void createWallTile()
     {
+        //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
+        MeshRenderer ren = objPrefabList_Wall[0].GetComponent<MeshRenderer>();
+        prefabSize = (int)ren.bounds.size.x;
+        float sizeY = ren.bounds.size.y;
+        float sizeZ = ren.bounds.size.z;
 
+        //Floor -> 상위 노드(this) -> 111
+        GameObject subWall = new GameObject();
+
+        // subWall의 부모노드 설정
+        subWall.transform.parent = wall.transform;
+        subWall.name = "subWall";
+
+        for (int i = 0; i < TileSizeX; i++)
+        {
+            //position 설정
+            Vector3 Vwall = new Vector3(i * prefabSize, 0, 0);
+            //Debug.Log(Vwall);
+
+            //오브젝트생성
+            GameObject obj = Instantiate(objPrefabList_Wall[Random.Range(0, max_Wall)], subWall.transform);
+
+            //obj 위치지정
+            obj.transform.position = Vwall;
+
+            //MapData 넣기
+            obj.AddComponent<MapData>();
+
+            //MapData 가져오기
+            MapData data = obj.GetComponent<MapData>();
+            data.pos = Vwall;
+
+
+            //리스트에 추가
+            mapWall.Add(data);
+
+
+            //오브젝트구분 
+            obj.name = "wall" + objNum.ToString();
+            objNum++;
+
+            //태그 지정
+            obj.tag = "Wall";
+            data.tagName = "Wall";
+
+            //레이어 지정
+            obj.layer = 7;
+            data.LayerNum = 7;
+        }
+        //콜라이더 만들기
+        subWall.AddComponent<BoxCollider>();
+
+        //콜라이더 가져오기
+        BoxCollider Cbox = subWall.GetComponent<BoxCollider>();
+
+        //콜라이더 사이즈 조절
+        Cbox.size = new Vector3(TileSizeX * prefabSize, sizeY, sizeZ);
+
+        //콜라이더 위치 조절
+        //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
+        Cbox.center = new Vector3(((TileSizeX * prefabSize / 2) - (prefabSize / 2)),
+             sizeY / (prefabSize/2),
+             -(prefabSize / 2) - (sizeZ/2));
+        //((TileSizeX * prefabSize / 2) - (prefabSize / 2))
+        //다시 사용하기 위한 초기화
+        TileSizeX = 0;
     }
-
-    private void createFWTile(GameObject _parent)
-    {
-
-    }
-
 
 }
