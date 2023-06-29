@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System.Text;
 
+
 /// <summary>
 /// 위치정보와 레이어,태그 정보를 가지고있어서 제이스데이터를 바탕으로 다른 프리팹으로도 같은형태의 맵을 만들수있음
 /// </summary>
@@ -58,12 +59,14 @@ public class MapCreate : MonoBehaviour
     private int prefabSize; //프리팹하나의 크기 
     private int tempZ;
 
+    //입력값
     public InputField InputRow;
     public InputField InputColumn;
 
     //오브젝트 고유번호
     private int objNum;
 
+    //제이슨저장용
     StringBuilder JsonSbFloor;
     StringBuilder JsonSbWall;
     StringBuilder JsonSbDeco;
@@ -79,9 +82,6 @@ public class MapCreate : MonoBehaviour
 
     void Start()
     {
-        //로드
-
-
         
     }
 
