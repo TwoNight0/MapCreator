@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.UI;
 using UnityEngine;
 using System.Text;
 
@@ -57,6 +58,9 @@ public class MapCreate : MonoBehaviour
     private int prefabSize; //프리팹하나의 크기 
     private int tempZ;
 
+    public InputField InputRow;
+    public InputField InputColumn;
+
     //오브젝트 고유번호
     private int objNum;
 
@@ -78,10 +82,7 @@ public class MapCreate : MonoBehaviour
         //로드
 
 
-        //저장된 제이슨 초기화
-        RemoveJson("MapFloor", JsonSbFloor);
-        RemoveJson("MapWall", JsonSbWall);
-        RemoveJson("MapDeco", JsonSbDeco);
+        
     }
 
     void Update()
@@ -140,7 +141,7 @@ public class MapCreate : MonoBehaviour
     /// 2. 저장된 리스트를 제이슨화
     /// 3. 파일로 저장
     /// </summary>
-    public void SaveMap()
+    public void BtnSaveMap()
     {
         //저장된 제이슨 초기화
         RemoveJson("MapFloor", JsonSbFloor);
@@ -186,6 +187,13 @@ public class MapCreate : MonoBehaviour
             //제이슨 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json", tmep);
         }
+    }
+    public void BtnRemoveJson()
+    {
+        //저장된 제이슨 초기화
+        RemoveJson("MapFloor", JsonSbFloor);
+        RemoveJson("MapWall", JsonSbWall);
+        RemoveJson("MapDeco", JsonSbDeco);
     }
 
     /// <summary>
@@ -239,7 +247,15 @@ public class MapCreate : MonoBehaviour
         }
     }
 
+    public void BtnLoadMap()
+    {
+        LoadMapCreate(LoadMap("MapFloor"),"subFloor",floor);
+        LoadMapCreate(LoadMap("MapWall"),"subWall",wall);
+        LoadMapCreate(LoadMap("MapDeco"),"subDeco",deco);
+    }
+
     /// <summary>
+    /// 해당경로에 해당하는 리스트를 반환함(없으면 빈리스트를 반환)
     /// 0. 스타트시 일단 한번 실행
     /// 1. 제이슨데이터 파일를 가져와 역직렬화
     /// 2. 리스트로 다시 가져오고 
@@ -247,24 +263,77 @@ public class MapCreate : MonoBehaviour
     /// 4. 태그와 레이어 조정
     /// </summary>
     /// <returns></returns>
-    public List<MapData> LoadMap()
+    private List<MapData> LoadMap(string _JsonName)
     {
-        if ((File.ReadAllText(Application.dataPath + "/TestJson.json")) != null){
-            
+        //경로에 저장된게 없으면 새로운걸 만듬
+        if ((File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json")) == null){
+            List<MapData> newList = new List<MapData>();
+            Debug.Log("값이 없어 빈리스트를 반환함");
+            return newList;
         }
-       
+
         //3개의 정보를 다해야함
-        string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/Map.json");
-        List<MapData> result = JsonConvert.DeserializeObject<List<MapData>>(str); //리스트까지됨
+        string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json");
+        //List<MapData> result = JsonConvert.DeserializeObject<List<MapData>>(str); //오류뜸
+        List<MapData> result = JsonUtility.FromJson<List<MapData>>(str);
+        Debug.Log("제대로 들어옴");
         return result;
+    }
+
+    private void LoadMapCreate(List<MapData> _loadResult, string _name, GameObject _parent) 
+    {
+        if(_loadResult == null) {
+            return;
+        }
+
+        //subObj 생성 및 이름 할당
+        GameObject subObj = new GameObject(_name);
+
+        //부모 만들어주기
+        subObj.transform.parent = _parent.transform;
+
+        //리스트의 길이만큼 하나하나를 만들어야함
+        for(int i = 0; i<_loadResult.Count; i++)
+        {
+            //생성 및 부모설정
+            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subObj.transform);
+
+            //pos 조정
+            obj.transform.position = _loadResult[i].pos;
+
+            //tag 태그
+            obj.transform.tag = _loadResult[i].tag;
+
+            //layer 레이어
+            obj.layer = _loadResult[i].LayerNum;
+
+        }
+
     }
 
     #region  create
     /// <summary>
     /// 입력한 가로 x 세로 만큼 타일을 만들어주는 메서드
     /// </summary>
-    public void createFloorTile()
+    public void BtnCreateFloorTile()
     {
+        //InputField값 가져오기
+        string tmp = InputRow.text;
+        string tmp2 = InputRow.text;
+
+        //임시 int
+        int resultIntX, resultIntZ = 0;
+
+        int.TryParse(tmp, out resultIntX);
+        int.TryParse(tmp2, out resultIntZ);
+
+        //값확인
+        if(resultIntX > 0 && resultIntZ > 0)
+        {
+            TileSizeRow = resultIntX;
+            TileSizecolumn = resultIntZ;
+        }
+
         //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
         MeshRenderer ren = objPrefabList_Floor[0].GetComponent<MeshRenderer>();
         prefabSize = (int)ren.bounds.size.x;
@@ -342,7 +411,7 @@ public class MapCreate : MonoBehaviour
     /// <summary>
     /// 입력한 가로에따른 타일을 만들어주는 메서드
     /// </summary>
-    public void createWallTile()
+    public void BtnCreateWallTile()
     {
         //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
         MeshRenderer ren = objPrefabList_Wall[0].GetComponent<MeshRenderer>();
