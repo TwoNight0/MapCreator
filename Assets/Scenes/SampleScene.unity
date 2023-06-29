@@ -417,8 +417,8 @@ MonoBehaviour:
   - {fileID: 6517184508489584946, guid: 9bbb5245987b43043972821dcbdd765b, type: 3}
   - {fileID: 7127966759364203001, guid: dd057b69bb9b25e468854341f1abb5a6, type: 3}
   - {fileID: 4808101341289430985, guid: 2e85d1506bb7a5c48bf1c391515f5261, type: 3}
-  TileSizeX: 4
-  TileSizeZ: 1
+  TileSizeRow: 0
+  TileSizeColumnm: 0
 --- !u!4 &673426929
 Transform:
   m_ObjectHideFlags: 0
