@@ -181,11 +181,15 @@ public class MapCreate : MonoBehaviour
                     _SBJson.Append(tmp);
                     tmp = null;
                 }
+
             }
             _SBJson.Append("]");
             //StringBuilder -> string 변환
+            _SBJson.Remove(1, 1);
             string tmep = _SBJson.ToString();
             Debug.Log(tmep);
+
+
 
             //제이슨 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json", tmep);
