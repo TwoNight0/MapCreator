@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 1362273918342885126}
   - component: {fileID: 2686431797236228259}
   - component: {fileID: 192784200842384489}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 02_Kitchen_01_Chopper
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1362273918342885126
 Transform:

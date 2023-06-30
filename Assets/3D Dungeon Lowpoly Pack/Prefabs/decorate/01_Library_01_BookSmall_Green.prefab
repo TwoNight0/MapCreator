@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 5302272086334992781}
   - component: {fileID: 9095775687976451624}
   - component: {fileID: 6475710630050958050}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_Library_01_BookSmall_Green
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5302272086334992781
 Transform:

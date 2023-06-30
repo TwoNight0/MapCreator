@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 8955455131676277955}
   - component: {fileID: 5469605717609313126}
   - component: {fileID: 7783071324823127980}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 05_Vault_01_Coin#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8955455131676277955
 Transform:

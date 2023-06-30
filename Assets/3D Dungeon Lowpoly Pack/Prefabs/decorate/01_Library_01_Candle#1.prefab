@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 6353003201315039826}
   - component: {fileID: 8036037283843040759}
   - component: {fileID: 5215531331136688445}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_Library_01_Candle#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6353003201315039826
 Transform:

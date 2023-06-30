@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 8945906599101862381}
   - component: {fileID: 5443133631042494024}
   - component: {fileID: 7812921248674343554}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_DiningHall_01_Bowl#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8945906599101862381
 Transform:

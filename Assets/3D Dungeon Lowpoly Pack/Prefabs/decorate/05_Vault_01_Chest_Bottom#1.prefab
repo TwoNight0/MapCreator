@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 6375636129220516525}
   - component: {fileID: 8058370004407211272}
   - component: {fileID: 5202189299571368386}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 05_Vault_01_Chest_Bottom#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6375636129220516525
 Transform:

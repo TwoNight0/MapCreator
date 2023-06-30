@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 460061091465641846}
   - component: {fileID: 3588714372778078419}
   - component: {fileID: 1596908683585274905}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_IronBar
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &460061091465641846
 Transform:

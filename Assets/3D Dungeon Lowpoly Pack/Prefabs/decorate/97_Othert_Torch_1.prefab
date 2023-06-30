@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 6621173160983818908}
   - component: {fileID: 7803887671633607993}
   - component: {fileID: 5451621868015815155}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 97_Othert_Torch_1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6621173160983818908
 Transform:

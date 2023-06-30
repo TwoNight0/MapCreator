@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 3769563866615321629}
   - component: {fileID: 288219141017312184}
   - component: {fileID: 2601675966969212786}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 97_Othert_Barrel_Whole
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3769563866615321629
 Transform:

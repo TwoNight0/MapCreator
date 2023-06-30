@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 40858769728537148}
   - component: {fileID: 3980886580631834009}
   - component: {fileID: 1214287486428051795}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_CooperBar
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &40858769728537148
 Transform:

@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 6913417485431021143}
   - component: {fileID: 7520658467713454578}
   - component: {fileID: 5744983775969338680}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 99_Decorations_SpiderWebb_2
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6913417485431021143
 Transform:

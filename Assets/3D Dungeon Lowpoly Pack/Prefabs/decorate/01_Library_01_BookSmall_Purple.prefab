@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 865955203592405034}
   - component: {fileID: 4299713055203905423}
   - component: {fileID: 2039938731013126981}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_Library_01_BookSmall_Purple
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &865955203592405034
 Transform:

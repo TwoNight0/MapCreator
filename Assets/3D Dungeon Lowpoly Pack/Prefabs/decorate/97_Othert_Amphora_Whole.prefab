@@ -9,12 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2443188378321887073}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 97_Othert_Amphora_Whole
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2443188378321887073
 Transform:
@@ -44,12 +44,12 @@ GameObject:
   - component: {fileID: 6071232890172867985}
   - component: {fileID: 7958658475124100624}
   - component: {fileID: 8923872634846957380}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Amphora.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6071232890172867985
 Transform:
@@ -127,12 +127,12 @@ GameObject:
   - component: {fileID: 1573283555595463568}
   - component: {fileID: 8578417775069335838}
   - component: {fileID: 1029232940439058906}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Amphora_Lid.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1573283555595463568
 Transform:

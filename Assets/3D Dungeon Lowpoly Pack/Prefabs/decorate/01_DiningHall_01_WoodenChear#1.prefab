@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 6794612351270787612}
   - component: {fileID: 7630386921888617913}
   - component: {fileID: 5620601408671048051}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_DiningHall_01_WoodenChear#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6794612351270787612
 Transform:

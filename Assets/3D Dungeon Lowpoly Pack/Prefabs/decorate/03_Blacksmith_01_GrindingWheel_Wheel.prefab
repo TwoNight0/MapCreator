@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 3241744598832099249}
   - component: {fileID: 1968959367145496596}
   - component: {fileID: 4375195726787007710}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_GrindingWheel_Wheel
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3241744598832099249
 Transform:

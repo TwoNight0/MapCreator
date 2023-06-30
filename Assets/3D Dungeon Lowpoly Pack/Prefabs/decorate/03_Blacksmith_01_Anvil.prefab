@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 1765626466226453831}
   - component: {fileID: 3399963180976026338}
   - component: {fileID: 633863188746290728}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_Anvil
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1765626466226453831
 Transform:

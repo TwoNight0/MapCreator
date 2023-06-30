@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 4595033932045190147}
   - component: {fileID: 606592392868694950}
   - component: {fileID: 3427234749510614892}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_Hammer#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4595033932045190147
 Transform:

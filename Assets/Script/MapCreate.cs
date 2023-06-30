@@ -71,6 +71,10 @@ public class MapCreate : MonoBehaviour
     StringBuilder JsonSbWall;
     StringBuilder JsonSbDeco;
 
+    //벽을 안보이게 할때 사용
+    bool walloff;
+    bool Decooff;
+
 
     [Tooltip("floor리스트의 최댓값")] private int max_Floor;
     [Tooltip("wall리스트의 최댓값")] private int max_Wall;
@@ -134,6 +138,9 @@ public class MapCreate : MonoBehaviour
         JsonSbFloor = new StringBuilder();
         JsonSbWall = new StringBuilder();
         JsonSbDeco = new StringBuilder();
+
+        //bool 초기화
+        walloff = true;
     }
 
     /// <summary>
@@ -188,8 +195,6 @@ public class MapCreate : MonoBehaviour
             _SBJson.Remove(1, 1);
             string tmep = _SBJson.ToString();
             Debug.Log(tmep);
-
-
 
             //제이슨 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json", tmep);
@@ -497,4 +502,22 @@ public class MapCreate : MonoBehaviour
         TileSizeRow = 1;
     }
     #endregion
+
+    public void wallinvisible()
+    {
+        walloff = !walloff;
+        wall.SetActive(walloff);
+        
+        //wall 아래 sub 아래 wall의 render들을 가져온다음 그것들의 알파도를 건들여야함
+        
+        if(wall.transform.childCount > 0) //서브가있는지 확인해야해
+        {
+            int wall;
+
+
+        }
+
+
+    }
+
 }

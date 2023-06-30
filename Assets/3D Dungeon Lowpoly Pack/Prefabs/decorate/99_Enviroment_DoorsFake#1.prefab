@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 2986715310479385177}
   - component: {fileID: 2223980337167805948}
   - component: {fileID: 4123570048483186998}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 99_Enviroment_DoorsFake#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2986715310479385177
 Transform:

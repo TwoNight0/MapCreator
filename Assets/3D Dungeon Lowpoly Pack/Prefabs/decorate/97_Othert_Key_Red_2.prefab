@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 8911472206362794260}
   - component: {fileID: 5477559486686844593}
   - component: {fileID: 7773428586112524923}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 97_Othert_Key_Red_2
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8911472206362794260
 Transform:

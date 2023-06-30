@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 5630454043272762695}
   - component: {fileID: 8758585982059567842}
   - component: {fileID: 6802767236704546344}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 97_Othert_Splash_1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5630454043272762695
 Transform:

@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 2199958490873321342}
   - component: {fileID: 2965630259742169307}
   - component: {fileID: 1066506813564005393}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 96_Traps_Trap_Spiner
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2199958490873321342
 Transform:

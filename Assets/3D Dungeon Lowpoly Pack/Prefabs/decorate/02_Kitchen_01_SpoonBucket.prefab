@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 2329165963377134442}
   - component: {fileID: 1728546143413552335}
   - component: {fileID: 3466066124688961541}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 02_Kitchen_01_SpoonBucket
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2329165963377134442
 Transform:

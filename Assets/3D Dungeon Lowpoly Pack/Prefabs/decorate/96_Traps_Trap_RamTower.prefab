@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 919754314573527581}
   - component: {fileID: 4281872354487219640}
   - component: {fileID: 2056090530975465842}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 96_Traps_Trap_RamTower
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &919754314573527581
 Transform:

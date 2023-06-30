@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 6782127961730932745}
   - component: {fileID: 760144262204288548}
   - component: {fileID: 5575204916904613756}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6782127961730932745
 Transform:
@@ -94,12 +94,12 @@ GameObject:
   - component: {fileID: 1280351954716810573}
   - component: {fileID: 5179001064635109073}
   - component: {fileID: 6453842719130736698}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CutWheel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1280351954716810573
 Transform:
@@ -175,12 +175,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8562011732148347081}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 96_Traps_Trap_FloorWheel
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8562011732148347081
 Transform:

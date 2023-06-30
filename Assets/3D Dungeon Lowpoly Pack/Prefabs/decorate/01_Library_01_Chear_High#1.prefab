@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 1028363490108865481}
   - component: {fileID: 4173324682652841068}
   - component: {fileID: 2165765201594712230}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_Library_01_Chear_High#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &1028363490108865481
 Transform:

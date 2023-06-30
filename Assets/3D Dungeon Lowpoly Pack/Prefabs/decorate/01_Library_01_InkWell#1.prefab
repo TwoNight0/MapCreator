@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 7609262588306579781}
   - component: {fileID: 6788705398135320288}
   - component: {fileID: 8778259899347966506}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 01_Library_01_InkWell#1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7609262588306579781
 Transform:

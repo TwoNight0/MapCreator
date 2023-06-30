@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 960551059958754580}
   - component: {fileID: 4250073741435364017}
   - component: {fileID: 2098603506233022075}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 04_Bedroom_01_Matrace_ForBeed_1
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &960551059958754580
 Transform:

@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 5571345405108100211}
   - component: {fileID: 8862730805445006294}
   - component: {fileID: 6708755942078867228}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_Blower
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5571345405108100211
 Transform:

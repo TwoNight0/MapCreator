@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 5973704778451941283}
   - component: {fileID: 7298372702025381894}
   - component: {fileID: 4804760278462991564}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 99_Decorations_WallBanner_2
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5973704778451941283
 Transform:

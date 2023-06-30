@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 5732487772513357318}
   - component: {fileID: 8656543919257076131}
   - component: {fileID: 6901431753885496681}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: 03_Blacksmith_01_WoodenRack
-  m_TagString: Untagged
+  m_TagString: Decoration
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5732487772513357318
 Transform:
