@@ -168,6 +168,7 @@ public class MapCreate : MonoBehaviour
     {
         if (_List.Count != 0)
         {
+            _SBJson.Append("[");
             //리스트의 크기를 비교.  리스트의 크기는 생성할때 추가 중임
             for (int i = 0; i < _List.Count; i++)
             {
@@ -176,10 +177,12 @@ public class MapCreate : MonoBehaviour
                 for (int k = 0; k < _arr.Length; k++)
                 {
                     string tmp = JsonUtility.ToJson(_arr[k]);
+                    _SBJson.Append(",");
                     _SBJson.Append(tmp);
                     tmp = null;
                 }
             }
+            _SBJson.Append("]");
             //StringBuilder -> string 변환
             string tmep = _SBJson.ToString();
             Debug.Log(tmep);
@@ -275,6 +278,7 @@ public class MapCreate : MonoBehaviour
         //3개의 정보를 다해야함
         string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json");
         //List<MapData> result = JsonConvert.DeserializeObject<List<MapData>>(str); //오류뜸
+        Debug.Log(str);
         List<MapData> result = JsonUtility.FromJson<List<MapData>>(str);
         Debug.Log("제대로 들어옴");
         return result;
@@ -319,7 +323,7 @@ public class MapCreate : MonoBehaviour
     {
         //InputField값 가져오기
         string tmp = InputRow.text;
-        string tmp2 = InputRow.text;
+        string tmp2 = InputColumn.text;
 
         //임시 int
         int resultIntX, resultIntZ = 0;
@@ -419,6 +423,19 @@ public class MapCreate : MonoBehaviour
         float sizeY = ren.bounds.size.y;
         float sizeZ = ren.bounds.size.z;
 
+        //InputField값 가져오기
+        string tmp = InputRow.text;
+
+        //임시 int
+        int resultIntX = 0;
+
+        int.TryParse(tmp, out resultIntX);
+
+        //값확인
+        if (resultIntX > 0)
+        {
+            TileSizeRow = resultIntX;
+        }
         //Floor -> 상위 노드(this) -> 111
         GameObject subWall = new GameObject();
 
