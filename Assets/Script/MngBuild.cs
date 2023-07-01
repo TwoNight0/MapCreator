@@ -13,7 +13,7 @@ public class MngBuild : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ray();
+        //ray();
     }
 
 

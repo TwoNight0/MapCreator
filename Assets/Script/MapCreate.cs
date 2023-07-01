@@ -4,29 +4,26 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine.UI;
 using UnityEngine;
-using System.Text;
+using System.Text; //stringBuilder용
+
 
 
 /// <summary>
 /// 위치정보와 레이어,태그 정보를 가지고있어서 제이스데이터를 바탕으로 다른 프리팹으로도 같은형태의 맵을 만들수있음
 /// </summary>
 [System.Serializable]
-public class MapData : MonoBehaviour
+public class MapData
 {
-    //public float x,y,z;
-    public Vector3 pos;
-
+    public float x,y,z;
     public int LayerNum = 6;
     public string tagName = "";
     
     public void printData()
     {
-        Debug.Log("Position : " + pos);
         Debug.Log("TagName : " + tagName);
         Debug.Log("LayerNum : " + LayerNum);
     }
 }
-
 
 public class MapCreate : MonoBehaviour
 {
@@ -42,16 +39,6 @@ public class MapCreate : MonoBehaviour
     private GameObject wall;
     private GameObject deco;
 
-    //subObj 추적용 리스트
-    private List<GameObject> mapFloor;
-    private List<GameObject> mapWall;
-    private List<GameObject> mapDeco;
-
-    //제이슨 저장용 arr
-    MapData[] arrFloor;
-    MapData[] arrWall;
-    MapData[] arrDeco;
-
     [Header("타일 사이즈")] //타일 사이즈
     [SerializeField, Tooltip("타일의 가로, 1이상이여야함")] int TileSizeRow;
     [SerializeField, Tooltip("타일의 세로, 1이상이여야함")] int TileSizecolumn;
@@ -66,18 +53,14 @@ public class MapCreate : MonoBehaviour
     //오브젝트 고유번호
     private int objNum;
 
-    //제이슨저장용
-    StringBuilder JsonSbFloor;
-    StringBuilder JsonSbWall;
-    StringBuilder JsonSbDeco;
-
     //벽을 안보이게 할때 사용
     bool walloff;
     bool Decooff;
 
-
     [Tooltip("floor리스트의 최댓값")] private int max_Floor;
     [Tooltip("wall리스트의 최댓값")] private int max_Wall;
+
+    List<MapData> ListLoad;
 
     private void Awake()
     {
@@ -86,6 +69,7 @@ public class MapCreate : MonoBehaviour
 
     void Start()
     {
+       
         
     }
 
@@ -103,11 +87,6 @@ public class MapCreate : MonoBehaviour
         floor = new GameObject(); //바닥의부모
         wall = new GameObject(); //벽들의 부모
         deco = new GameObject(); //장식품들의 부모
-
-        //리스트 할당 subObj 추적용
-        mapFloor = new List<GameObject>();
-        mapWall = new List<GameObject>();
-        mapDeco = new List<GameObject>();
 
         //이름할당
         map.name = "Map";
@@ -134,13 +113,11 @@ public class MapCreate : MonoBehaviour
         TileSizeRow = 1;
         TileSizecolumn = 1;
 
-        //StringBuilder 초기화
-        JsonSbFloor = new StringBuilder();
-        JsonSbWall = new StringBuilder();
-        JsonSbDeco = new StringBuilder();
-
         //bool 초기화
         walloff = true;
+
+        ListLoad = new List<MapData>();
+
     }
 
     /// <summary>
@@ -150,62 +127,78 @@ public class MapCreate : MonoBehaviour
     /// </summary>
     public void BtnSaveMap()
     {
-        //저장된 제이슨 초기화
-        RemoveJson("MapFloor", JsonSbFloor);
-        RemoveJson("MapWall", JsonSbWall);
-        RemoveJson("MapDeco", JsonSbDeco);
-
-        //리스트 초기화
-        mapFloor.Clear();
-        mapWall.Clear();
-        mapDeco.Clear();
-
-        //리스트추가 및 MapData 포지션 할당
-        AddObjList(mapFloor, "Floor");
-        AddObjList(mapWall, "Wall");
-        AddObjList(mapDeco, "Deco");
-
-        //저장
-        SaveObj(mapFloor, arrFloor, "MapFloor", JsonSbFloor);
-        SaveObj(mapWall, arrWall, "MapWall", JsonSbWall);
-        SaveObj(mapDeco, arrDeco, "MapDeco", JsonSbDeco);
+        SaveObj(floor);
+        SaveObj(wall);
+        SaveObj(deco);
     }
 
-    private void SaveObj(List<GameObject> _List, MapData[] _arr, string _JsonName, StringBuilder _SBJson)
-    {
-        if (_List.Count != 0)
-        {
-            _SBJson.Append("[");
-            //리스트의 크기를 비교.  리스트의 크기는 생성할때 추가 중임
-            for (int i = 0; i < _List.Count; i++)
-            {
-                _arr = _List[i].GetComponentsInChildren<MapData>();
-                //직렬화 및 문자열 합체 
-                for (int k = 0; k < _arr.Length; k++)
-                {
-                    string tmp = JsonUtility.ToJson(_arr[k]);
-                    _SBJson.Append(",");
-                    _SBJson.Append(tmp);
-                    tmp = null;
-                }
+    /// <summary>
+    /// 저장할때 오브젝트들을 가져오고 그 오브젝트의 정보들을 담을 mapdata 데이터를 만들고 
+    /// 담고 리스트에 넣고 그 리스트를 저장!
+    /// </summary>
+    /// <param name="_List"></param>
+    /// <param name="_arr"></param>
+    /// <param name="_JsonName"></param>
+    /// <param name="_SBJson"></param>
 
+    private void SaveObj(GameObject _nodeName)
+    {
+        // _nodeName == floor임
+        // sub의 개수 
+        int subCount = _nodeName.transform.childCount;
+        //subObj들이 담겨있는 리스트
+
+        if (subCount > 0) //sub의개수가 1개이상일때 작동
+        {
+            //floor 들의 정보를 담을 리스트 추후 제이슨으로 변환예정
+            List<MapData> tempList = new List<MapData>();
+
+            for (int i = 0; i < subCount; i++)
+            {
+                //subobj들 가져옴
+                Transform subTransform = _nodeName.transform.GetChild(i); 
+                GameObject subObject = subTransform.gameObject;
+
+                int objectCount = subObject.transform.childCount;
+
+                if(objectCount > 0)
+                {
+                    for (int k = 0; k < objectCount; k++)
+                    {
+                        Transform objTransform = subObject.transform.GetChild(k);
+                        GameObject Object = objTransform.gameObject;
+
+                        //담을 데이터 생성
+                        MapData data = new MapData();
+
+                        data.x = Object.transform.position.x;
+                        data.y = Object.transform.position.y;
+                        data.z = Object.transform.position.z;
+
+                        data.tagName = Object.transform.tag;
+                        data.LayerNum = Object.layer;
+
+                        //제이슨 변환용 리스트에 담기
+                        tempList.Add(data);
+
+                    }
+                }
             }
-            _SBJson.Append("]");
-            //StringBuilder -> string 변환
-            _SBJson.Remove(1, 1);
-            string tmep = _SBJson.ToString();
-            Debug.Log(tmep);
 
             //제이슨 저장
-            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json", tmep);
+            string str = JsonConvert.SerializeObject(tempList);
+            //파일 저장
+            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
         }
     }
+
+
+
+
     public void BtnRemoveJson()
     {
         //저장된 제이슨 초기화
-        RemoveJson("MapFloor", JsonSbFloor);
-        RemoveJson("MapWall", JsonSbWall);
-        RemoveJson("MapDeco", JsonSbDeco);
+  
     }
 
     /// <summary>
@@ -227,43 +220,13 @@ public class MapCreate : MonoBehaviour
     /// </summary>
     /// <param name="_List"> mapFloor,mapWall,mapDeco</param>
     /// <param name="_FWD">Floor, Wall, Deco</param>
-    private void AddObjList(List<GameObject> _List, string _FWD)
-    {
-        //상위 노드 찾음 obj = Floor
-        GameObject obj = GameObject.Find(_FWD);
-        // obj = Floor
-        // obj.child = subFloor
-        // obj.child.child = floor <= 찾는오브젝트 
-        // 이 오브젝트의 위치값을 
-        // MapData.pos에 넣어야해
-
-        //상위노드 아래의 개수에 따라 리스트에 넣음 
-        if (obj.transform.childCount > 0)
-        { // subObj가 있음? 있으면 아래로
-            //subObj = subFloor
-            int count = obj.transform.childCount; //floor0 ~의 개수
-            for (int i = 0; i < count; i++)
-            {
-                _List.Add(obj.transform.GetChild(i).gameObject); //ex) Floor에 subFloor을 넣음
-                GameObject subObj = obj.transform.GetChild(i).gameObject; //subFloor
-                if (subObj.transform.childCount > 0)
-                {
-                    for (int k = 0; k < subObj.transform.childCount; k++)
-                    {
-                        GameObject smallObj = subObj.transform.GetChild(k).gameObject;
-                        MapData data = smallObj.GetComponent<MapData>();
-                        data.pos = smallObj.transform.position;
-                    }
-                }
-            }
-        }
-    }
+ 
 
     public void BtnLoadMap()
     {
-        LoadMapCreate(LoadMap("MapFloor"),"subFloor",floor);
-        LoadMapCreate(LoadMap("MapWall"),"subWall",wall);
-        LoadMapCreate(LoadMap("MapDeco"),"subDeco",deco);
+        LoadMap(floor, "subFloor");
+        LoadMap(wall, "subWall");
+        LoadMap(deco, "subDeco");
     }
 
     /// <summary>
@@ -275,53 +238,52 @@ public class MapCreate : MonoBehaviour
     /// 4. 태그와 레이어 조정
     /// </summary>
     /// <returns></returns>
-    private List<MapData> LoadMap(string _JsonName)
+    private void LoadMap(GameObject _nodeName, string _name)
     {
-        //경로에 저장된게 없으면 새로운걸 만듬
-        if ((File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json")) == null){
-            List<MapData> newList = new List<MapData>();
-            Debug.Log("값이 없어 빈리스트를 반환함");
-            return newList;
-        }
-
         //3개의 정보를 다해야함
-        string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json");
-        //List<MapData> result = JsonConvert.DeserializeObject<List<MapData>>(str); //오류뜸
-        Debug.Log(str);
-        List<MapData> result = JsonUtility.FromJson<List<MapData>>(str);
-        Debug.Log("제대로 들어옴");
-        return result;
+        string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
+        
+
+        ListLoad = JsonConvert.DeserializeObject<List<MapData>>(str);
+
+
+        LoadMapCreate(_nodeName, _name);
     }
 
-    private void LoadMapCreate(List<MapData> _loadResult, string _name, GameObject _parent) 
+    /// <summary>
+    /// 리스트를 바탕으로 오브젝트를 생성
+    /// </summary>
+    private void LoadMapCreate(GameObject _nodeName, string _name) 
     {
-        if(_loadResult == null) {
-            return;
-        }
-
-        //subObj 생성 및 이름 할당
-        GameObject subObj = new GameObject(_name);
-
-        //부모 만들어주기
-        subObj.transform.parent = _parent.transform;
-
-        //리스트의 길이만큼 하나하나를 만들어야함
-        for(int i = 0; i<_loadResult.Count; i++)
+        if(ListLoad.Count > 0)
         {
-            //생성 및 부모설정
-            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subObj.transform);
+            //subObj 생성 및 이름 할당
+            GameObject subObj = new GameObject(_name);
 
-            //pos 조정
-            obj.transform.position = _loadResult[i].pos;
+            //부모 만들어주기
+            subObj.transform.parent = _nodeName.transform;
+            if (ListLoad != null && ListLoad.Count > 0)
+            {
+                //리스트의 길이만큼 하나하나를 만들어야함
+                for (int i = 0; i < ListLoad.Count; i++)
+                {
+                    //생성 및 부모설정
+                    GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subObj.transform);
 
-            //tag 태그
-            obj.transform.tag = _loadResult[i].tag;
+                    //pos 조정
+                    obj.transform.position = new Vector3(ListLoad[i].x, ListLoad[i].y, ListLoad[i].z);
 
-            //layer 레이어
-            obj.layer = _loadResult[i].LayerNum;
+                    //tag 태그
+                    obj.transform.tag = ListLoad[i].tagName;
 
+                    //layer 레이어
+                    obj.layer = ListLoad[i].LayerNum;
+
+                }
+            }
+        
         }
-
+        
     }
 
     #region  create
@@ -362,9 +324,6 @@ public class MapCreate : MonoBehaviour
         subFloor.transform.parent = floor.transform;
         subFloor.name = "subFloor";
 
-        ////리스트에 추가
-        mapFloor.Add(subFloor);
-
         for (int i = 0; i < totalPixel; i++)
         {
             //z축으로 늘리기위함
@@ -383,23 +342,15 @@ public class MapCreate : MonoBehaviour
             //위치지정
             obj.transform.position = Vfloor;
 
-            //MapData 넣기
-            obj.AddComponent<MapData>();
-
-            //MapData 가져오기
-            MapData data = obj.GetComponent<MapData>();
-
             //오브젝트구분, 이름할당
             obj.name = "floor" + objNum.ToString();
             objNum++;
 
             //태그 지정
             obj.tag = "Ground";
-            data.tagName = "Ground";
 
             //레이어 지정
             obj.layer = 6;
-            data.LayerNum = 6;
         }
         //콜라이더 만들기
         subFloor.AddComponent<BoxCollider>();
@@ -464,23 +415,15 @@ public class MapCreate : MonoBehaviour
             //obj 위치지정
             obj.transform.position = Vwall;
 
-            //MapData 넣기
-            obj.AddComponent<MapData>();
-
-            //MapData 가져오기
-            MapData data = obj.GetComponent<MapData>();
-
             //오브젝트구분 
             obj.name = "wall" + objNum.ToString();
             objNum++;
 
             //태그 지정
             obj.tag = "Wall";
-            data.tagName = "Wall";
 
             //레이어 지정
             obj.layer = 7;
-            data.LayerNum = 7;
         }
         //콜라이더 만들기
         subWall.AddComponent<BoxCollider>();
