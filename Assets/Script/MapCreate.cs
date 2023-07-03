@@ -5,8 +5,7 @@ using System.IO;
 using UnityEngine.UI;
 using UnityEngine;
 using System.Text; //stringBuilder용
-
-
+using UnityEditor;
 
 /// <summary>
 /// 위치정보와 레이어,태그 정보를 가지고있어서 제이스데이터를 바탕으로 다른 프리팹으로도 같은형태의 맵을 만들수있음
@@ -83,6 +82,8 @@ public class MapCreate : MonoBehaviour
 
     }
 
+    
+
     private void test()
     {
         List<MapData> testList = new List<MapData>();
@@ -123,6 +124,7 @@ public class MapCreate : MonoBehaviour
         Debug.Log("DSLy: "+ DeSerialList[0].y);
         Debug.Log("DSLz: "+ DeSerialList[0].z);
 
+        //AssetPreview.GetAssetPreview();
     }
 
     //초기화
