@@ -27,6 +27,7 @@ public class MapData
 
 public class MapCreate : MonoBehaviour
 {
+
     [Header("프리팹 리스트")] //프리팹리스트
     [SerializeField, Tooltip("바닥에 사용될 프리팹")] private List<GameObject> objPrefabList_Floor;
     [SerializeField, Tooltip("벽에 사용될 프리팹")] private List<GameObject> objPrefabList_Wall;
@@ -60,21 +61,67 @@ public class MapCreate : MonoBehaviour
     [Tooltip("floor리스트의 최댓값")] private int max_Floor;
     [Tooltip("wall리스트의 최댓값")] private int max_Wall;
 
-    List<MapData> ListLoad;
+    List<List<MapData>> LoadLOL;
+
+
 
     private void Awake()
     {
         initData();
+
     }
 
     void Start()
     {
-       
-        
+        test();
+
+
     }
 
     void Update()
     {
+
+    }
+
+    private void test()
+    {
+        List<MapData> testList = new List<MapData>();
+        List<MapData> testList2 = new List<MapData>();
+        MapData data = new MapData();
+        MapData data2 = new MapData();
+
+        List<string> JsonStrings = new List<string>();
+
+        data.x = 1;
+        data.y = 1;
+        data.z = 1;
+
+        testList.Add(data);
+
+        data2.x = 2;
+        data2.y = 2;
+        data2.z = 2;
+
+        testList2.Add(data2);
+
+        string str1 = JsonConvert.SerializeObject(testList);
+        string str2 = JsonConvert.SerializeObject(testList2);
+
+        Debug.Log("맵데이터 리스트 1 : " + str1);
+        Debug.Log("맵데이터 리스트 2 : " + str2);
+
+        JsonStrings.Add(str1);
+        JsonStrings.Add(str2);
+
+        Debug.Log("제이슨스트링리스트 : " + JsonStrings);
+        Debug.Log("제이슨스트링리스트 : " + JsonStrings[0]);
+
+        //tempList 사용
+        List<MapData> DeSerialList = JsonConvert.DeserializeObject<List < MapData >> (JsonStrings[0]);
+        Debug.Log("DSL: "+ DeSerialList);
+        Debug.Log("DSLx: "+ DeSerialList[0].x);
+        Debug.Log("DSLy: "+ DeSerialList[0].y);
+        Debug.Log("DSLz: "+ DeSerialList[0].z);
 
     }
 
@@ -116,7 +163,8 @@ public class MapCreate : MonoBehaviour
         //bool 초기화
         walloff = true;
 
-        ListLoad = new List<MapData>();
+        LoadLOL = new List<List<MapData>>();
+
 
     }
 
@@ -135,12 +183,9 @@ public class MapCreate : MonoBehaviour
     /// <summary>
     /// 저장할때 오브젝트들을 가져오고 그 오브젝트의 정보들을 담을 mapdata 데이터를 만들고 
     /// 담고 리스트에 넣고 그 리스트를 저장!
+    /// 문제점 : 서브오브젝트 하나에 모든 오브젝트를 다 때려넣어서 부분별로 움직이기가 쉽지 않음
     /// </summary>
-    /// <param name="_List"></param>
-    /// <param name="_arr"></param>
-    /// <param name="_JsonName"></param>
-    /// <param name="_SBJson"></param>
-
+    /// <param name="_nodeName">큰 노드</param>
     private void SaveObj(GameObject _nodeName)
     {
         // _nodeName == floor임
@@ -187,14 +232,73 @@ public class MapCreate : MonoBehaviour
 
             //제이슨 저장
             string str = JsonConvert.SerializeObject(tempList);
+
             //파일 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
         }
     }
 
+    //overloading
+    /// <summary>
+    /// subObject를 구분해서 만들어 주고 그 밑에 데이터를 넣음
+    /// </summary>
+    /// <param name="_nodeName"></param>
+    private void SaveObj(GameObject _nodeName, List<List<MapData>> _ListOfList)
+    {
+        // _nodeName == floor임
+        // sub의 개수 
+        int subCount = _nodeName.transform.childCount;
+        //subObj들이 담겨있는 리스트
 
+        if (subCount > 0) //sub의개수가 1개이상일때 작동
+        {
+            //floor 들의 정보를 담을 리스트 추후 제이슨으로 변환예정
 
+            for (int i = 0; i < subCount; i++)
+            {
+                //MapData담을 임시그릇
+                List<MapData> tempList = new List<MapData>(); 
 
+                //subobj들 가져옴
+                Transform subTransform = _nodeName.transform.GetChild(i);
+                GameObject subObject = subTransform.gameObject;
+
+                int objectCount = subObject.transform.childCount;
+
+                //floor 들의 갯수
+                if (objectCount > 0)
+                {
+                    for (int k = 0; k < objectCount; k++)
+                    {
+                        Transform objTransform = subObject.transform.GetChild(k);
+                        GameObject Object = objTransform.gameObject;
+
+                        //담을 데이터 생성
+                        MapData data = new MapData();
+
+                        data.x = Object.transform.position.x;
+                        data.y = Object.transform.position.y;
+                        data.z = Object.transform.position.z;
+
+                        data.tagName = Object.transform.tag;
+                        data.LayerNum = Object.layer;
+
+                        //제이슨 변환용 리스트에 담기
+                        tempList.Add(data);
+
+                    }
+                }
+                _ListOfList.Add(tempList);
+            }
+
+            //제이슨 저장
+            string str = JsonConvert.SerializeObject(_ListOfList);
+            //파일 저장
+            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
+        }
+    }
+
+    #region 제이슨 지우는 부분인데... 일단놔둬
     public void BtnRemoveJson()
     {
         //저장된 제이슨 초기화
@@ -214,13 +318,13 @@ public class MapCreate : MonoBehaviour
         //제이슨 저장
         File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json", tmep);
     }
+    #endregion
 
     /// <summary>
     /// 리스트에 추가 및 MapData 포지션 할당
     /// </summary>
     /// <param name="_List"> mapFloor,mapWall,mapDeco</param>
     /// <param name="_FWD">Floor, Wall, Deco</param>
- 
 
     public void BtnLoadMap()
     {
@@ -242,48 +346,60 @@ public class MapCreate : MonoBehaviour
     {
         //3개의 정보를 다해야함
         string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
-        
 
-        ListLoad = JsonConvert.DeserializeObject<List<MapData>>(str);
+        LoadLOL = JsonConvert.DeserializeObject<List<List<MapData>>>(str);
+        //LoadLOL = JsonUtility.FromJson<List<List<MapData>>>(str);
 
 
-        LoadMapCreate(_nodeName, _name);
+        LoadMapCreate(_nodeName, _name, LoadLOL);
     }
 
     /// <summary>
     /// 리스트를 바탕으로 오브젝트를 생성
     /// </summary>
-    private void LoadMapCreate(GameObject _nodeName, string _name) 
+    private void LoadMapCreate(GameObject _nodeName, string _name, List<List<MapData>> _LoadLOL) 
     {
-        if(ListLoad.Count > 0)
+        //LOL의 크기가 1개이상일때 동작
+        if(_LoadLOL.Count > 0)
         {
             //subObj 생성 및 이름 할당
             GameObject subObj = new GameObject(_name);
 
-            //부모 만들어주기
+            //부모 만들어주기 floor를 subObj의 부모로 
             subObj.transform.parent = _nodeName.transform;
-            if (ListLoad != null && ListLoad.Count > 0)
+
+            if (_LoadLOL != null && _LoadLOL.Count > 0)
             {
                 //리스트의 길이만큼 하나하나를 만들어야함
-                for (int i = 0; i < ListLoad.Count; i++)
+                for (int i = 0; i < _LoadLOL.Count; i++)//subObj의 개수만큼임 하고있음
                 {
-                    //생성 및 부모설정
-                    GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subObj.transform);
+                    for (int k = 0; i < _LoadLOL[i].Count; k++)//sub의 자식개수 만큼 반복문 도는 중
+                    {
+                        //데이터 부분
+                        List<MapData> tmp = _LoadLOL[i];
 
-                    //pos 조정
-                    obj.transform.position = new Vector3(ListLoad[i].x, ListLoad[i].y, ListLoad[i].z);
+                        //오브젝트 생성 및 부모!설정
+                        GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subObj.transform);
 
-                    //tag 태그
-                    obj.transform.tag = ListLoad[i].tagName;
+                        //pos 조정
+                        obj.transform.position = new Vector3(tmp[i].x, tmp[i].y, tmp[i].z);
 
-                    //layer 레이어
-                    obj.layer = ListLoad[i].LayerNum;
+                        //tag 태그
+                        obj.transform.tag = tmp[i].tagName;
+
+                        //layer 레이어
+                        obj.layer = tmp[i].LayerNum;
+                    }
 
                 }
             }
-        
+   
         }
-        
+        else
+        {
+            Debug.Log("불러올 내용이 없습니다");
+        }
+      
     }
 
     #region  create
