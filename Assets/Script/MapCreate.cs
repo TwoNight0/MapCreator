@@ -60,7 +60,7 @@ public class MapCreate : MonoBehaviour
     [Tooltip("floor리스트의 최댓값")] private int max_Floor;
     [Tooltip("wall리스트의 최댓값")] private int max_Wall;
 
-    List<List<MapData>> LoadLOL;
+    List<string> LoadLOLstr;
 
 
 
@@ -72,7 +72,7 @@ public class MapCreate : MonoBehaviour
 
     void Start()
     {
-        test();
+        //test();
 
 
     }
@@ -114,11 +114,16 @@ public class MapCreate : MonoBehaviour
         JsonStrings.Add(str1);
         JsonStrings.Add(str2);
 
+        string js = JsonConvert.SerializeObject(JsonStrings);
+
+        List<string> deserailList = JsonConvert.DeserializeObject<List<string>>(js);
+
         Debug.Log("제이슨스트링리스트 : " + JsonStrings);
         Debug.Log("제이슨스트링리스트 : " + JsonStrings[0]);
 
         //tempList 사용
-        List<MapData> DeSerialList = JsonConvert.DeserializeObject<List < MapData >> (JsonStrings[0]);
+        List<MapData> DeSerialList = JsonConvert.DeserializeObject<List < MapData >> (deserailList[0]);
+
         Debug.Log("DSL: "+ DeSerialList);
         Debug.Log("DSLx: "+ DeSerialList[0].x);
         Debug.Log("DSLy: "+ DeSerialList[0].y);
@@ -165,7 +170,7 @@ public class MapCreate : MonoBehaviour
         //bool 초기화
         walloff = true;
 
-        LoadLOL = new List<List<MapData>>();
+        LoadLOLstr = new List<string>();
 
 
     }
@@ -177,9 +182,9 @@ public class MapCreate : MonoBehaviour
     /// </summary>
     public void BtnSaveMap()
     {
-        SaveObj(floor);
-        SaveObj(wall);
-        SaveObj(deco);
+        SaveObj(floor, LoadLOLstr);
+        SaveObj(wall, LoadLOLstr);
+        SaveObj(deco, LoadLOLstr);
     }
 
     /// <summary>
@@ -245,7 +250,7 @@ public class MapCreate : MonoBehaviour
     /// subObject를 구분해서 만들어 주고 그 밑에 데이터를 넣음
     /// </summary>
     /// <param name="_nodeName"></param>
-    private void SaveObj(GameObject _nodeName, List<List<MapData>> _ListOfList)
+    private void SaveObj(GameObject _nodeName, List<string> _ListOfListStr)
     {
         // _nodeName == floor임
         // sub의 개수 
@@ -258,7 +263,7 @@ public class MapCreate : MonoBehaviour
 
             for (int i = 0; i < subCount; i++)
             {
-                //MapData담을 임시그릇
+                //MapData담을 임시그릇 제이슨화 해야함
                 List<MapData> tempList = new List<MapData>(); 
 
                 //subobj들 가져옴
@@ -290,11 +295,14 @@ public class MapCreate : MonoBehaviour
 
                     }
                 }
-                _ListOfList.Add(tempList);
+                string tmp = JsonConvert.SerializeObject(tempList);
+
+                //제이슨 문자열이 담긴 string tmp를 리스트에 저장함
+                _ListOfListStr.Add(tmp);
             }
 
-            //제이슨 저장
-            string str = JsonConvert.SerializeObject(_ListOfList);
+            //제이슨 문자열이 담긴 List str을 이중 제이슨 저장
+            string str = JsonConvert.SerializeObject(_ListOfListStr);
             //파일 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
         }
@@ -349,48 +357,47 @@ public class MapCreate : MonoBehaviour
         //3개의 정보를 다해야함
         string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
 
-        LoadLOL = JsonConvert.DeserializeObject<List<List<MapData>>>(str);
+        LoadLOLstr = JsonConvert.DeserializeObject<List<string>>(str);
         //LoadLOL = JsonUtility.FromJson<List<List<MapData>>>(str);
 
 
-        LoadMapCreate(_nodeName, _name, LoadLOL);
+        LoadMapCreate(_nodeName, _name, LoadLOLstr);
     }
 
     /// <summary>
     /// 리스트를 바탕으로 오브젝트를 생성
     /// </summary>
-    private void LoadMapCreate(GameObject _nodeName, string _name, List<List<MapData>> _LoadLOL) 
+    private void LoadMapCreate(GameObject _nodeName, string _name, List<string> _LoadLOLstr) 
     {
         //LOL의 크기가 1개이상일때 동작
-        if(_LoadLOL.Count > 0)
+        if(_LoadLOLstr.Count > 0)
         {
-            //subObj 생성 및 이름 할당
-            GameObject subObj = new GameObject(_name);
-
-            //부모 만들어주기 floor를 subObj의 부모로 
-            subObj.transform.parent = _nodeName.transform;
-
-            if (_LoadLOL != null && _LoadLOL.Count > 0)
+            if (_LoadLOLstr != null && _LoadLOLstr.Count > 0)
             {
                 //리스트의 길이만큼 하나하나를 만들어야함
-                for (int i = 0; i < _LoadLOL.Count; i++)//subObj의 개수만큼임 하고있음
+                for (int i = 0; i < _LoadLOLstr.Count; i++)//subObj의 개수만큼임 하고있음
                 {
-                    for (int k = 0; i < _LoadLOL[i].Count; k++)//sub의 자식개수 만큼 반복문 도는 중
-                    {
-                        //데이터 부분
-                        List<MapData> tmp = _LoadLOL[i];
+                    //subObj 생성 및 이름 할당
+                    GameObject subObj = new GameObject(_name);
 
+                    //부모 만들어주기 floor를 subObj의 부모로 
+                    subObj.transform.parent = _nodeName.transform;
+                    //데이터 부분 (제이슨을 다시 풀어줌)
+                    List<MapData> tmp = JsonConvert.DeserializeObject<List<MapData>>(_LoadLOLstr[i]);
+
+                    for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
+                    {
                         //오브젝트 생성 및 부모!설정
                         GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subObj.transform);
 
                         //pos 조정
-                        obj.transform.position = new Vector3(tmp[i].x, tmp[i].y, tmp[i].z);
+                        obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
 
                         //tag 태그
-                        obj.transform.tag = tmp[i].tagName;
+                        obj.transform.tag = tmp[k].tagName;
 
                         //layer 레이어
-                        obj.layer = tmp[i].LayerNum;
+                        obj.layer = tmp[k].LayerNum;
                     }
 
                 }
@@ -399,7 +406,7 @@ public class MapCreate : MonoBehaviour
         }
         else
         {
-            Debug.Log("불러올 내용이 없습니다");
+            Debug.Log(_name + ": " + "불러올 내용이 없습니다");
         }
       
     }
