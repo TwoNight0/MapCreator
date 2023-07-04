@@ -187,7 +187,9 @@ public class MapCreate : MonoBehaviour
         SaveObj(deco, LoadLOLstr);
     }
 
+    #region Save
     /// <summary>
+    /// 사용x 예전 세이브 버전
     /// 저장할때 오브젝트들을 가져오고 그 오브젝트의 정보들을 담을 mapdata 데이터를 만들고 
     /// 담고 리스트에 넣고 그 리스트를 저장!
     /// 문제점 : 서브오브젝트 하나에 모든 오브젝트를 다 때려넣어서 부분별로 움직이기가 쉽지 않음
@@ -306,27 +308,11 @@ public class MapCreate : MonoBehaviour
             //파일 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
         }
-    }
-
-    #region 제이슨 지우는 부분인데... 일단놔둬
-    public void BtnRemoveJson()
-    {
-        //저장된 제이슨 초기화
-  
-    }
-
-    /// <summary>
-    /// 제이슨 초기화
-    /// </summary>
-    /// <param name="_JsonName"></param>
-    /// <param name="_SBJson"></param>
-    private void RemoveJson(string _JsonName, StringBuilder _SBJson)
-    {
-        _SBJson.Clear();
-        string tmep = _SBJson.ToString();
-
-        //제이슨 저장
-        File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _JsonName + ".json", tmep);
+        else //아무것도없을때 저장하면 제이슨을 초기화함
+        {
+            string str = null;
+            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
+        }
     }
     #endregion
 
@@ -343,6 +329,7 @@ public class MapCreate : MonoBehaviour
         LoadMap(deco, "subDeco");
     }
 
+    #region Load
     /// <summary>
     /// 해당경로에 해당하는 리스트를 반환함(없으면 빈리스트를 반환)
     /// 0. 스타트시 일단 한번 실행
@@ -410,6 +397,7 @@ public class MapCreate : MonoBehaviour
         }
       
     }
+    #endregion
 
     #region  create
     /// <summary>
