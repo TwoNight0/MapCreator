@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class MngBuild : MonoBehaviour
 {
-
     private enum BtnSelected
     {
         None,
@@ -14,28 +13,25 @@ public class MngBuild : MonoBehaviour
         Deco
     }
 
-    
+    BtnSelected BtnState;
 
     //GameObject
     private GameObject Right; //UI가 있는 영역
     private GameObject BtnLayer;
-    
+
+    //List<GameObject> prefab;
+    [SerializeField]private List<GameObject> ListFloor;
+    [SerializeField]private List<GameObject> ListWall;
+    [SerializeField]private List<GameObject> ListDeco;
+
     //Button
-    private Button FloorTab;
-    private Button WallTab;
-    private Button DecoTab;
+    private Button BtnFloor;
+    private Button BtnWall;
+    private Button BtnDeco;
 
-    //int
-    private int StateBtnNow;
-
-
-    //bool
-    private bool isFloorTab = false;
-    private bool isWallTab = false;
-    private bool isDecoTab = false;
-
-
-    private Color myBlue = new Color(0.5f, 0.5f, 1, 1);
+    //Color
+    private Color onColor = new Color(0.5f, 0.5f, 1, 1);
+    private Color offColor = Color.gray;
 
     private void Awake()
     {
@@ -45,18 +41,15 @@ public class MngBuild : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //초기 FloorTab만 키고 나머지는 어둡게 만들기
-        isFloorTab = true;
-        isWallTab = false;
-        isDecoTab = false;
-        BtnColorChange(FloorTab, isFloorTab);
-        BtnColorChange(WallTab, isWallTab);
-        BtnColorChange(DecoTab, isDecoTab);
+        //시작시 켜질 탭
+        BtnState = BtnSelected.Floor;
+        BtnSwitch();
+
     }
 
     private void initMng()
     {
-        StateBtnNow = (int)BtnSelected.None;
+        #region 오브젝트 할당
         //Debug.Log(StateBtnNow);
         GameObject cansvas = GameObject.Find("Canvas");
         Right = cansvas.transform.Find("Right").gameObject;
@@ -66,38 +59,32 @@ public class MngBuild : MonoBehaviour
         BtnLayer = Right.transform.Find("BtnLayer").gameObject;
         //Debug.Log(BtnLayer.name);
 
-        //버튼 레이어에어 버튼 꺼내기
+        //버튼 레이어에어 버튼 꺼내기 및 버튼할당
         GameObject btn = BtnLayer.transform.GetChild(0).gameObject;
-
-        FloorTab = btn.GetComponent<Button>();
-        FloorTab.onClick.AddListener(() => 
-        {
-            BtnSwitch(ref isFloorTab);
-            BtnColorChange(FloorTab, isFloorTab);
-        });
-
+        BtnFloor = btn.GetComponent<Button>();
         btn = BtnLayer.transform.GetChild(1).gameObject;
-        WallTab = btn.GetComponent<Button>();
-        WallTab.onClick.AddListener(() => { 
-            BtnSwitch(ref isWallTab);
-            BtnColorChange(WallTab, isWallTab);
-        });
-
+        BtnWall = btn.GetComponent<Button>();
         btn = BtnLayer.transform.GetChild(2).gameObject;
-        DecoTab = btn.GetComponent<Button>();
-        DecoTab.onClick.AddListener(() => { 
-            BtnSwitch(ref isDecoTab);
-            BtnColorChange(DecoTab, isDecoTab);
-        });
+        BtnDeco = btn.GetComponent<Button>();
         btn = null;
         Destroy(btn);
+        #endregion
+        #region Btn AddListener
+        BtnFloor.onClick.AddListener(() =>
+        {
+            BtnState = BtnSelected.Floor;
+            BtnSwitch();
+        });
+        BtnWall.onClick.AddListener(() => {
+            BtnState = BtnSelected.Wall;
+            BtnSwitch();
+        });
 
-        //초기 버튼 색 변경
-        isWallTab = false;
-        isDecoTab = false;
-
-
-
+        BtnDeco.onClick.AddListener(() => {
+            BtnState = BtnSelected.Deco;
+            BtnSwitch();
+        });
+        #endregion
     }
 
     // Update is called once per frame
@@ -117,27 +104,82 @@ public class MngBuild : MonoBehaviour
     /// 버튼 스위치
     /// </summary>
     /// <param name="_btn"> 바꿀 bool value</param>
-    public void BtnSwitch(ref bool _btnBool)
+    public void BoolSwitch(ref bool _btnBool)
     {
         _btnBool = !_btnBool;
         Debug.Log(_btnBool);
-       
+    }
+
+    private void BtnSwitch()
+    {
+        switch (BtnState)
+        {
+            case BtnSelected.None: Debug.Log("None"); break;
+            case BtnSelected.Floor:
+                {
+                    //컬러변경
+                    BtnColorChange(BtnFloor, onColor);
+                    BtnColorChange(BtnWall, offColor);
+                    BtnColorChange(BtnDeco, offColor);
+                    
+                    //image에 켜진 버튼에 맞게 프리팹 버튼을 그려줌
+                    
+                    break;
+                }
+            case BtnSelected.Wall:
+                {
+                    //컬러변경
+                    BtnColorChange(BtnFloor, offColor);
+                    BtnColorChange(BtnWall, onColor);
+                    BtnColorChange(BtnDeco, offColor);
+
+
+                    break;
+                }
+            case BtnSelected.Deco:
+                {
+                    //컬러변경
+                    BtnColorChange(BtnFloor, offColor);
+                    BtnColorChange(BtnWall, offColor);
+                    BtnColorChange(BtnDeco, onColor);
+
+
+                    break;
+                }
+        }
     }
 
     /// <summary>
     /// 버튼 색변경 함수
     /// </summary>
     /// <param name="_btn">적용될 버튼</param>
-    private void BtnColorChange(Button _btn, bool _btnbool)
+    private void BtnColorChange(Button _btn, Color _color)
     {
-        if (_btnbool)//선택
-        {
-            _btn.image.color = myBlue;
+        _btn.image.color = _color;
+    }
+
+    //프리팹의 이미지를 가져오고 하드디스크에 이미지를 저장
+    private void getPrefabTexture()
+    {
+
+    }
+    //시작할때 쓰는기능 처음만 불러오고 나중에는 SetActive 처리하자
+    //자동으로 addlistener를 넣어주는 기능을 만들어야해 (right의 image 밑에!)
+    // 버튼 이미지,
+    // 눌렀을때 마우스 끝에 있게 만드는기능
+    private void makePrefabButton(List<GameObject> _prefabList)
+    {
+        //반복문의 끝 할당
+        int count = _prefabList.Count;
+
+        for (int i = 0; i < count; i++) { 
+            //오브젝트 만들기
+
+            //버튼 오브젝트 추가해주기 
+
+            //이미지 변경해주기
         }
-        else //비선택
-        {
-            _btn.image.color = Color.gray;
-        }
+
     }
 
     /// <summary>

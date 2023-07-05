@@ -357,7 +357,7 @@ public class MapCreate : MonoBehaviour
     private void LoadMapCreate(GameObject _nodeName, string _name, List<string> _LoadLOLstr) 
     {
         //LOL의 크기가 1개이상일때 동작
-        if(_LoadLOLstr.Count > 0)
+        if(_LoadLOLstr != null && _LoadLOLstr.Count > 0)
         {
             if (_LoadLOLstr != null && _LoadLOLstr.Count > 0)
             {
