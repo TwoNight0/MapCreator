@@ -9,7 +9,6 @@ public class MngBuild : MonoBehaviour
     private enum BtnSelected
     {
         None,
-        Floor,
         Wall,
         Deco
     }
@@ -43,19 +42,25 @@ public class MngBuild : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //이미지 뽑는 함수
+        //getPrefabTexture(ListDeco, Deco);
+
         //시작시 켜질 탭
-        BtnState = BtnSelected.Floor;
+        BtnState = BtnSelected.Deco;
         BtnSwitch();
 
         //test
-        getPrefabTexture(ListFloor);
 
+        //createPrefabButton(ListFloor);
+        //createPrefabButton(ListWall);
+        createPrefabButton(ListDeco);
     }
 
     private void initMng()
     {
         #region 오브젝트 할당
         mouseObj = new GameObject();
+        mouseObj.name = "mouseObj";
         //Debug.Log(StateBtnNow);
         GameObject cansvas = GameObject.Find("Canvas");
         Right = cansvas.transform.Find("Right").gameObject;
@@ -67,20 +72,13 @@ public class MngBuild : MonoBehaviour
 
         //버튼 레이어에어 버튼 꺼내기 및 버튼할당
         GameObject btn = BtnLayer.transform.GetChild(0).gameObject;
-        BtnFloor = btn.GetComponent<Button>();
-        btn = BtnLayer.transform.GetChild(1).gameObject;
         BtnWall = btn.GetComponent<Button>();
-        btn = BtnLayer.transform.GetChild(2).gameObject;
+        btn = BtnLayer.transform.GetChild(1).gameObject;
         BtnDeco = btn.GetComponent<Button>();
         btn = null;
         Destroy(btn);
         #endregion
         #region Btn AddListener
-        BtnFloor.onClick.AddListener(() =>
-        {
-            BtnState = BtnSelected.Floor;
-            BtnSwitch();
-        });
         BtnWall.onClick.AddListener(() => {
             BtnState = BtnSelected.Wall;
             BtnSwitch();
@@ -121,34 +119,19 @@ public class MngBuild : MonoBehaviour
         switch (BtnState)
         {
             case BtnSelected.None: Debug.Log("None"); break;
-            case BtnSelected.Floor:
-                {
-                    //컬러변경
-                    BtnColorChange(BtnFloor, onColor);
-                    BtnColorChange(BtnWall, offColor);
-                    BtnColorChange(BtnDeco, offColor);
-                    
-                    //image에 켜진 버튼에 맞게 프리팹 버튼을 그려줌
-                    
-                    break;
-                }
             case BtnSelected.Wall:
                 {
                     //컬러변경
-                    BtnColorChange(BtnFloor, offColor);
                     BtnColorChange(BtnWall, onColor);
                     BtnColorChange(BtnDeco, offColor);
-
 
                     break;
                 }
             case BtnSelected.Deco:
                 {
                     //컬러변경
-                    BtnColorChange(BtnFloor, offColor);
                     BtnColorChange(BtnWall, offColor);
                     BtnColorChange(BtnDeco, onColor);
-
 
                     break;
                 }
@@ -168,7 +151,7 @@ public class MngBuild : MonoBehaviour
     /// 프리팹에서 이미지 뽑아오는 함수
     /// </summary>
     /// <param name="_List"></param>
-    private void getPrefabTexture(List<GameObject> _List)
+    private void getPrefabTexture(List<GameObject> _List, string _FolderName)
     {
         if(_List == null)
         {
@@ -180,14 +163,17 @@ public class MngBuild : MonoBehaviour
         for (int i = 0; i< count; i++)
         {
             Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
+
             if(tmpTexture2D != null)
             {
-                Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
+                byte[] texturePNGBytes = tmpTexture2D.EncodeToPNG();
+                //Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
+
+                File.WriteAllBytes(Application.dataPath + "/PrefabImgFolder/" + _FolderName + "/"+ + i + ".png", texturePNGBytes);
                 
             }
 
 
-            File.WriteAllText(Application.dataPath + "/PrefabImgFolder/" + i +".png", "PrefabImg" + i);
         }
     }
 
@@ -198,29 +184,44 @@ public class MngBuild : MonoBehaviour
     //프리팹의 이미지를 가져오고 하드디스크에 이미지를 저장?
     private void createPrefabButton(List<GameObject> _List)
     {
+        if (_List == null)
+        {
+            return;
+        }
+
         Transform contents = Right.transform.Find("PrefabScrollView").GetChild(0).GetChild(0).transform;
         int count = _List.Count;
         for (int i = 0; i < count; i++)
         {
-           
-            GameObject btnObj = new GameObject();
-            btnObj.transform.parent = contents;
-            btnObj.AddComponent<Button>();
-            btnObj.AddComponent<Image>();
-            Button btntmp = btnObj.GetComponent<Button>();
-            btntmp.onClick.AddListener(() => {
-                //클릭시 마우스위치에 프리팹을 소환해야해
-                mouseObj = null;
-                mouseObj = Instantiate(_List[i]);
+            Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
 
-            });
-            Image Imgtmp = btnObj.GetComponent<Image>();
-            //Imgtmp.sprite = mySprite;
+            if (tmpTexture2D != null)
+            {
+                //버튼생성
+                GameObject btnObj = new GameObject();
+                btnObj.name = _List[i].name;
+                btnObj.transform.parent = contents;
+                btnObj.AddComponent<Button>();
+                btnObj.AddComponent<Image>();
+                Button btntmp = btnObj.GetComponent<Button>();
+                btntmp.onClick.AddListener(() => {
+                    //클릭시 마우스위치에 프리팹을 소환해야해
+                    mouseObj = null;
+                    mouseObj = Instantiate(_List[i]);
+                    Debug.Log("z");
+                });
+                Image Imgtmp = btnObj.GetComponent<Image>();
 
-            //btntmp.image.sprite = mySprite;
+
+                //스프라이트 생성 및 할당
+                Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
+                Imgtmp.sprite = mySprite;
+
+
+            }
+
 
         }
-
     }
    
     /// <summary>
