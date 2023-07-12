@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-
+using System.IO;
 public class MngBuild : MonoBehaviour
 {
     private enum BtnSelected
@@ -16,8 +17,9 @@ public class MngBuild : MonoBehaviour
     BtnSelected BtnState;
 
     //GameObject
-    private GameObject Right; //UI°¡ ÀÖ´Â ¿µ¿ª
+    private GameObject Right; //UIê°€ ìˆëŠ” ì˜ì—­
     private GameObject BtnLayer;
+    private GameObject mouseObj;
 
     //List<GameObject> prefab;
     [SerializeField]private List<GameObject> ListFloor;
@@ -41,25 +43,29 @@ public class MngBuild : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //½ÃÀÛ½Ã ÄÑÁú ÅÇ
+        //ì‹œì‘ì‹œ ì¼œì§ˆ íƒ­
         BtnState = BtnSelected.Floor;
         BtnSwitch();
+
+        //test
+        getPrefabTexture(ListFloor);
 
     }
 
     private void initMng()
     {
-        #region ¿ÀºêÁ§Æ® ÇÒ´ç
+        #region ì˜¤ë¸Œì íŠ¸ í• ë‹¹
+        mouseObj = new GameObject();
         //Debug.Log(StateBtnNow);
         GameObject cansvas = GameObject.Find("Canvas");
         Right = cansvas.transform.Find("Right").gameObject;
 
-        //Äµ¹ö½º -> right(1) -> btnlayer
-        // ¹öÆ°·¹ÀÌ¾î ¹Ş¾Æ¿À±â
+        //ìº”ë²„ìŠ¤ -> right(1) -> btnlayer
+        // ë²„íŠ¼ë ˆì´ì–´ ë°›ì•„ì˜¤ê¸°
         BtnLayer = Right.transform.Find("BtnLayer").gameObject;
         //Debug.Log(BtnLayer.name);
 
-        //¹öÆ° ·¹ÀÌ¾î¿¡¾î ¹öÆ° ²¨³»±â ¹× ¹öÆ°ÇÒ´ç
+        //ë²„íŠ¼ ë ˆì´ì–´ì—ì–´ ë²„íŠ¼ êº¼ë‚´ê¸° ë° ë²„íŠ¼í• ë‹¹
         GameObject btn = BtnLayer.transform.GetChild(0).gameObject;
         BtnFloor = btn.GetComponent<Button>();
         btn = BtnLayer.transform.GetChild(1).gameObject;
@@ -93,7 +99,7 @@ public class MngBuild : MonoBehaviour
         //UpdataBtnAction();
     }
 
-    //³ªÁß¿¡ °ÔÀÓ½Ã½ºÅÛÀ¸·Î º¯°æ
+    //ë‚˜ì¤‘ì— ê²Œì„ì‹œìŠ¤í…œìœ¼ë¡œ ë³€ê²½
     public void UpdataBtnAction()
     {
         
@@ -101,9 +107,9 @@ public class MngBuild : MonoBehaviour
 
   
     /// <summary>
-    /// ¹öÆ° ½ºÀ§Ä¡
+    /// ë²„íŠ¼ ìŠ¤ìœ„ì¹˜
     /// </summary>
-    /// <param name="_btn"> ¹Ù²Ü bool value</param>
+    /// <param name="_btn"> ë°”ê¿€ bool value</param>
     public void BoolSwitch(ref bool _btnBool)
     {
         _btnBool = !_btnBool;
@@ -117,18 +123,18 @@ public class MngBuild : MonoBehaviour
             case BtnSelected.None: Debug.Log("None"); break;
             case BtnSelected.Floor:
                 {
-                    //ÄÃ·¯º¯°æ
+                    //ì»¬ëŸ¬ë³€ê²½
                     BtnColorChange(BtnFloor, onColor);
                     BtnColorChange(BtnWall, offColor);
                     BtnColorChange(BtnDeco, offColor);
                     
-                    //image¿¡ ÄÑÁø ¹öÆ°¿¡ ¸Â°Ô ÇÁ¸®ÆÕ ¹öÆ°À» ±×·ÁÁÜ
+                    //imageì— ì¼œì§„ ë²„íŠ¼ì— ë§ê²Œ í”„ë¦¬íŒ¹ ë²„íŠ¼ì„ ê·¸ë ¤ì¤Œ
                     
                     break;
                 }
             case BtnSelected.Wall:
                 {
-                    //ÄÃ·¯º¯°æ
+                    //ì»¬ëŸ¬ë³€ê²½
                     BtnColorChange(BtnFloor, offColor);
                     BtnColorChange(BtnWall, onColor);
                     BtnColorChange(BtnDeco, offColor);
@@ -138,7 +144,7 @@ public class MngBuild : MonoBehaviour
                 }
             case BtnSelected.Deco:
                 {
-                    //ÄÃ·¯º¯°æ
+                    //ì»¬ëŸ¬ë³€ê²½
                     BtnColorChange(BtnFloor, offColor);
                     BtnColorChange(BtnWall, offColor);
                     BtnColorChange(BtnDeco, onColor);
@@ -150,40 +156,75 @@ public class MngBuild : MonoBehaviour
     }
 
     /// <summary>
-    /// ¹öÆ° »öº¯°æ ÇÔ¼ö
+    /// ë²„íŠ¼ ìƒ‰ë³€ê²½ í•¨ìˆ˜
     /// </summary>
-    /// <param name="_btn">Àû¿ëµÉ ¹öÆ°</param>
+    /// <param name="_btn">ì ìš©ë  ë²„íŠ¼</param>
     private void BtnColorChange(Button _btn, Color _color)
     {
         _btn.image.color = _color;
     }
 
-    //ÇÁ¸®ÆÕÀÇ ÀÌ¹ÌÁö¸¦ °¡Á®¿À°í ÇÏµåµğ½ºÅ©¿¡ ÀÌ¹ÌÁö¸¦ ÀúÀå
-    private void getPrefabTexture()
+    /// <summary>
+    /// í”„ë¦¬íŒ¹ì—ì„œ ì´ë¯¸ì§€ ë½‘ì•„ì˜¤ëŠ” í•¨ìˆ˜
+    /// </summary>
+    /// <param name="_List"></param>
+    private void getPrefabTexture(List<GameObject> _List)
     {
+        if(_List == null)
+        {
+            return;
+        }
 
+        Transform contents = Right.transform.Find("PrefabScrollView").GetChild(0).GetChild(0).transform;
+        int count = _List.Count;
+        for (int i = 0; i< count; i++)
+        {
+            Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
+            if(tmpTexture2D != null)
+            {
+                Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
+                
+            }
+
+
+            File.WriteAllText(Application.dataPath + "/PrefabImgFolder/" + i +".png", "PrefabImg" + i);
+        }
     }
-    //½ÃÀÛÇÒ¶§ ¾²´Â±â´É Ã³À½¸¸ ºÒ·¯¿À°í ³ªÁß¿¡´Â SetActive Ã³¸®ÇÏÀÚ
-    //ÀÚµ¿À¸·Î addlistener¸¦ ³Ö¾îÁÖ´Â ±â´ÉÀ» ¸¸µé¾î¾ßÇØ (rightÀÇ image ¹Ø¿¡!)
-    // ¹öÆ° ÀÌ¹ÌÁö,
-    // ´­·¶À»¶§ ¸¶¿ì½º ³¡¿¡ ÀÖ°Ô ¸¸µå´Â±â´É
-    private void makePrefabButton(List<GameObject> _prefabList)
+
+    //ì‹œì‘í• ë•Œ ì“°ëŠ”ê¸°ëŠ¥ ì²˜ìŒë§Œ ë¶ˆëŸ¬ì˜¤ê³  ë‚˜ì¤‘ì—ëŠ” SetActive ì²˜ë¦¬í•˜ì
+    //ìë™ìœ¼ë¡œ addlistenerë¥¼ ë„£ì–´ì£¼ëŠ” ê¸°ëŠ¥ì„ ë§Œë“¤ì–´ì•¼í•´ (rightì˜ image ë°‘ì—!)
+    // ë²„íŠ¼ ì´ë¯¸ì§€,
+    // ëˆŒë €ì„ë•Œ ë§ˆìš°ìŠ¤ ëì— ìˆê²Œ ë§Œë“œëŠ”ê¸°ëŠ¥
+    //í”„ë¦¬íŒ¹ì˜ ì´ë¯¸ì§€ë¥¼ ê°€ì ¸ì˜¤ê³  í•˜ë“œë””ìŠ¤í¬ì— ì´ë¯¸ì§€ë¥¼ ì €ì¥?
+    private void createPrefabButton(List<GameObject> _List)
     {
-        //¹İº¹¹®ÀÇ ³¡ ÇÒ´ç
-        int count = _prefabList.Count;
+        Transform contents = Right.transform.Find("PrefabScrollView").GetChild(0).GetChild(0).transform;
+        int count = _List.Count;
+        for (int i = 0; i < count; i++)
+        {
+           
+            GameObject btnObj = new GameObject();
+            btnObj.transform.parent = contents;
+            btnObj.AddComponent<Button>();
+            btnObj.AddComponent<Image>();
+            Button btntmp = btnObj.GetComponent<Button>();
+            btntmp.onClick.AddListener(() => {
+                //í´ë¦­ì‹œ ë§ˆìš°ìŠ¤ìœ„ì¹˜ì— í”„ë¦¬íŒ¹ì„ ì†Œí™˜í•´ì•¼í•´
+                mouseObj = null;
+                mouseObj = Instantiate(_List[i]);
 
-        for (int i = 0; i < count; i++) { 
-            //¿ÀºêÁ§Æ® ¸¸µé±â
+            });
+            Image Imgtmp = btnObj.GetComponent<Image>();
+            //Imgtmp.sprite = mySprite;
 
-            //¹öÆ° ¿ÀºêÁ§Æ® Ãß°¡ÇØÁÖ±â 
+            //btntmp.image.sprite = mySprite;
 
-            //ÀÌ¹ÌÁö º¯°æÇØÁÖ±â
         }
 
     }
-
+   
     /// <summary>
-    /// ´©¸£¸é ¿ÀºêÁ§Æ®ÀÇ Á¤º¸¸¦ °¡Á®¿À´Â ÇÔ¼ö
+    /// ëˆ„ë¥´ë©´ ì˜¤ë¸Œì íŠ¸ì˜ ì •ë³´ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜
     /// </summary>
     private void rayFind()
     {
@@ -197,18 +238,21 @@ public class MngBuild : MonoBehaviour
 
     }
 
+
+
+
     /// <summary>
-    /// 1. ÇÁ¸®ÆÕµéÀÇ ÀÌ¹ÌÁö¸¦ °¡Á®¿Â ´ÙÀ½ ¹öÆ°¿¡ ÇÒ´ç
-    /// 2. ¹öÆ°À» ´©¸£¸é ¸¶¿ì½ºÆ÷Áö¼Ç¿¡ ¹°Ã¼°¡ µû¶ó´Ù´Ï°ÔÇÔ
-    /// 3. ¿ŞÂÊ¹öÆ°À» ´©¸£¸é ±× À§Ä¡¿¡ ¹°Ã¼¸¦ ³õÀ½(³õÀ»¼öÀÖÀ¸¸é ÃÊ·Ï»ö, ¾Æ´Ï¸é »¡°­)
-    /// 4. ¿À¸¥ÂÊ¹öÆ°À» ´©¸£¸é ÀúÀåµÈ ¿ÀºêÁ§Æ®¸¦ ¾ø¾Ö°í ÇÁ¸®ÆÕ¹öÆ°À» ´­·¯¾ß ´Ù½Ã °¡´É
+    /// 1. í”„ë¦¬íŒ¹ë“¤ì˜ ì´ë¯¸ì§€ë¥¼ ê°€ì ¸ì˜¨ ë‹¤ìŒ ë²„íŠ¼ì— í• ë‹¹
+    /// 2. ë²„íŠ¼ì„ ëˆ„ë¥´ë©´ ë§ˆìš°ìŠ¤í¬ì§€ì…˜ì— ë¬¼ì²´ê°€ ë”°ë¼ë‹¤ë‹ˆê²Œí•¨
+    /// 3. ì™¼ìª½ë²„íŠ¼ì„ ëˆ„ë¥´ë©´ ê·¸ ìœ„ì¹˜ì— ë¬¼ì²´ë¥¼ ë†“ìŒ(ë†“ì„ìˆ˜ìˆìœ¼ë©´ ì´ˆë¡ìƒ‰, ì•„ë‹ˆë©´ ë¹¨ê°•)
+    /// 4. ì˜¤ë¥¸ìª½ë²„íŠ¼ì„ ëˆ„ë¥´ë©´ ì €ì¥ëœ ì˜¤ë¸Œì íŠ¸ë¥¼ ì—†ì• ê³  í”„ë¦¬íŒ¹ë²„íŠ¼ì„ ëˆŒëŸ¬ì•¼ ë‹¤ì‹œ ê°€ëŠ¥
     /// </summary>
     private void objsMove()
     {
 
     }
 
-    //¸¶¿ì½º¿¡ ÀÖ´Â ¹°Ã¼ È¸Àü
+    //ë§ˆìš°ìŠ¤ì— ìˆëŠ” ë¬¼ì²´ íšŒì „
     private void objRotate()
     {
 
