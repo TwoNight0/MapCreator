@@ -26,13 +26,20 @@ public class MngBuild : MonoBehaviour
     [SerializeField]private List<GameObject> ListDeco;
 
     //Button
-    private Button BtnFloor;
     private Button BtnWall;
     private Button BtnDeco;
+
+    private List<GameObject> ListBtn;
 
     //Color
     private Color onColor = new Color(0.5f, 0.5f, 1, 1);
     private Color offColor = Color.gray;
+
+
+
+    //Transform
+    GameObject contents;
+
 
     private void Awake()
     {
@@ -45,15 +52,35 @@ public class MngBuild : MonoBehaviour
         //이미지 뽑는 함수
         //getPrefabTexture(ListDeco, Deco);
 
+        //버튼생성
+        createPrefabButton(ListWall);
+        createPrefabButton(ListDeco);
+
+        //리스트에 버튼의 게임오브젝트 넣기
+        btnListAdd();
+
+        #region Btn AddListener
+        BtnWall.onClick.AddListener(() => {
+            BtnState = BtnSelected.Wall;
+            BtnSwitch();
+        });
+
+        BtnDeco.onClick.AddListener(() => {
+            BtnState = BtnSelected.Deco;
+            BtnSwitch();
+        });
+        #endregion
+
+
         //시작시 켜질 탭
         BtnState = BtnSelected.Deco;
         BtnSwitch();
 
+
+
         //test
 
-        //createPrefabButton(ListFloor);
-        //createPrefabButton(ListWall);
-        createPrefabButton(ListDeco);
+
     }
 
     private void initMng()
@@ -78,17 +105,12 @@ public class MngBuild : MonoBehaviour
         btn = null;
         Destroy(btn);
         #endregion
-        #region Btn AddListener
-        BtnWall.onClick.AddListener(() => {
-            BtnState = BtnSelected.Wall;
-            BtnSwitch();
-        });
 
-        BtnDeco.onClick.AddListener(() => {
-            BtnState = BtnSelected.Deco;
-            BtnSwitch();
-        });
-        #endregion
+        //Content
+        contents = Right.transform.Find("PrefabScrollView").GetChild(0).GetChild(0).gameObject;
+
+        //List
+        ListBtn = new List<GameObject>();
     }
 
     // Update is called once per frame
@@ -102,7 +124,7 @@ public class MngBuild : MonoBehaviour
     {
         
     }
-
+    
   
     /// <summary>
     /// 버튼 스위치
@@ -125,6 +147,8 @@ public class MngBuild : MonoBehaviour
                     BtnColorChange(BtnWall, onColor);
                     BtnColorChange(BtnDeco, offColor);
 
+                    //클릭시 deco tag 의 오브젝트 비활성화
+                    onAndOffObjByTag("Decoration");
                     break;
                 }
             case BtnSelected.Deco:
@@ -133,6 +157,8 @@ public class MngBuild : MonoBehaviour
                     BtnColorChange(BtnWall, offColor);
                     BtnColorChange(BtnDeco, onColor);
 
+                    // 클릭시 wall tag의 오브젝트 비활성화
+                    onAndOffObjByTag("Wall");
                     break;
                 }
         }
@@ -148,6 +174,54 @@ public class MngBuild : MonoBehaviour
     }
 
     /// <summary>
+    /// create로 만든 모든 버튼들을 리스트에 담는 코드
+    /// </summary>
+    private void btnListAdd()
+    {
+        int tmpCount = contents.transform.childCount;
+
+        for (int i = 0; i < tmpCount; i++)
+        {
+            GameObject tmpObj = contents.transform.GetChild(i).gameObject;
+            if(tmpObj != null)
+            {
+                ListBtn.Add(tmpObj);
+            }
+        }
+        
+    }
+
+    /// <summary>
+    /// 특정위치 밑에 있는 오브젝트하위애들을 버튼에 맞게 꺼주는 함수
+    /// </summary>
+    private void onAndOffObjByTag(string _offTag)
+    {
+        int count = ListBtn.Count;
+
+        if(count == 0)
+        {
+            return;
+        }
+
+        for(int i = 0; i<count; i++)
+        {
+            if(ListBtn[i].tag == _offTag)
+            {
+                //원하는 것과 태그가 같으면 꺼주기
+                ListBtn[i].SetActive(false);
+            }
+            else
+            {
+                //원하는 것과 태그가 같지 않으면 켜주기
+                ListBtn[i].SetActive(true);
+            }
+
+        }
+    }
+
+
+
+    /// <summary>
     /// 프리팹에서 이미지 뽑아오는 함수
     /// </summary>
     /// <param name="_List"></param>
@@ -158,7 +232,6 @@ public class MngBuild : MonoBehaviour
             return;
         }
 
-        Transform contents = Right.transform.Find("PrefabScrollView").GetChild(0).GetChild(0).transform;
         int count = _List.Count;
         for (int i = 0; i< count; i++)
         {
@@ -168,9 +241,7 @@ public class MngBuild : MonoBehaviour
             {
                 byte[] texturePNGBytes = tmpTexture2D.EncodeToPNG();
                 //Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
-
                 File.WriteAllBytes(Application.dataPath + "/PrefabImgFolder/" + _FolderName + "/"+ + i + ".png", texturePNGBytes);
-                
             }
 
 
@@ -189,7 +260,6 @@ public class MngBuild : MonoBehaviour
             return;
         }
 
-        Transform contents = Right.transform.Find("PrefabScrollView").GetChild(0).GetChild(0).transform;
         int count = _List.Count;
         for (int i = 0; i < count; i++)
         {
@@ -200,7 +270,16 @@ public class MngBuild : MonoBehaviour
                 //버튼생성
                 GameObject btnObj = new GameObject();
                 btnObj.name = _List[i].name;
-                btnObj.transform.parent = contents;
+                if(_List == ListWall)
+                {
+                    btnObj.tag = "Wall";
+                }
+                else if(_List == ListDeco){
+                    btnObj.tag = "Decoration";
+                }
+
+                //contents를 부모로 만듬
+                btnObj.transform.parent = contents.transform;
                 btnObj.AddComponent<Button>();
                 btnObj.AddComponent<Image>();
                 Button btntmp = btnObj.GetComponent<Button>();
@@ -216,11 +295,7 @@ public class MngBuild : MonoBehaviour
                 //스프라이트 생성 및 할당
                 Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
                 Imgtmp.sprite = mySprite;
-
-
             }
-
-
         }
     }
    
