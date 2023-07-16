@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+
 public class MngBuild : MonoBehaviour
 {
     private enum BtnSelected
@@ -34,8 +35,6 @@ public class MngBuild : MonoBehaviour
     //Color
     private Color onColor = new Color(0.5f, 0.5f, 1, 1);
     private Color offColor = Color.gray;
-
-
 
     //Transform
     GameObject contents;
@@ -116,7 +115,13 @@ public class MngBuild : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //UpdataBtnAction();
+
+    }
+
+    private void FixedUpdate()
+    {
+        objsMove();
+
     }
 
     //나중에 게임시스템으로 변경
@@ -259,17 +264,18 @@ public class MngBuild : MonoBehaviour
         {
             return;
         }
-
         int count = _List.Count;
         for (int i = 0; i < count; i++)
         {
+            //여기에 고질적인 문제가있음 처음 에셋 프리뷰실행하면 null이뜸;
             Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
 
             if (tmpTexture2D != null)
             {
                 //버튼생성
                 GameObject btnObj = new GameObject();
-                btnObj.name = _List[i].name;
+                //숫자를 이름으로함
+                btnObj.name = i.ToString();
                 if(_List == ListWall)
                 {
                     btnObj.tag = "Wall";
@@ -284,13 +290,11 @@ public class MngBuild : MonoBehaviour
                 btnObj.AddComponent<Image>();
                 Button btntmp = btnObj.GetComponent<Button>();
                 btntmp.onClick.AddListener(() => {
-                    //클릭시 마우스위치에 프리팹을 소환해야해
-                    mouseObj = null;
-                    mouseObj = Instantiate(_List[i]);
-                    Debug.Log("z");
+                    int index = System.Convert.ToInt32(btnObj.name);
+                    createPrefabObj(btnObj.tag, index);
                 });
                 Image Imgtmp = btnObj.GetComponent<Image>();
-
+                
 
                 //스프라이트 생성 및 할당
                 Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
@@ -299,6 +303,33 @@ public class MngBuild : MonoBehaviour
         }
     }
    
+
+    /// <summary>
+    /// 버튼을 누르면 0,0,0 위치에 생성 
+    /// </summary>
+    /// <param name="_tag"></param>
+    private void createPrefabObj(string _tag, int _nameAsNum)
+    {
+        if(mouseObj.transform.childCount == 0)
+        {
+            if(_tag == "Wall")
+            {
+                //오브젝트를 생성하고 마우스오브젝트를 부모로 만듬 
+                GameObject newObj = Instantiate(ListWall[_nameAsNum], mouseObj.transform);
+            }
+            else if(_tag == "Decoration")
+            {
+                GameObject newObj = Instantiate(ListDeco[_nameAsNum], mouseObj.transform);
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+
+
+
     /// <summary>
     /// 누르면 오브젝트의 정보를 가져오는 함수
     /// </summary>
@@ -314,21 +345,22 @@ public class MngBuild : MonoBehaviour
 
     }
 
-
-
-
-    /// <summary>
-    /// 1. 프리팹들의 이미지를 가져온 다음 버튼에 할당
-    /// 2. 버튼을 누르면 마우스포지션에 물체가 따라다니게함
-    /// 3. 왼쪽버튼을 누르면 그 위치에 물체를 놓음(놓을수있으면 초록색, 아니면 빨강)
-    /// 4. 오른쪽버튼을 누르면 저장된 오브젝트를 없애고 프리팹버튼을 눌러야 다시 가능
-    /// </summary>
+    //마우스 오브젝트 이동
     private void objsMove()
     {
+        Vector3 Vmouse = new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y) ;
+        //Vector3 Vmouse = Input.mousePosition;
+        //Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //Debug.Log(worldPosition);
 
+        //Vector3 offset = Vmouse - worldPosition;
+        mouseObj.transform.position = Vmouse;
+        //mouseObj.transform.position = Vmouse;
+        //Camera.main.ScreenToWorldPoint();
+        //Debug.Log("마우스위치 : " + mouseObj.transform.position);
     }
 
-    //마우스에 있는 물체 회전
+    //마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
     private void objRotate()
     {
 
