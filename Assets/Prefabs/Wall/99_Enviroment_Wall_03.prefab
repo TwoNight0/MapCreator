@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5722707269199470825}
   - component: {fileID: 6872180449481956848}
   - component: {fileID: 9048642306034935972}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Wall_Main.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,9 +94,9 @@ GameObject:
   - component: {fileID: 5328354425764504947}
   - component: {fileID: -8083617603474776781}
   - component: {fileID: 7986309045004375147}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: 99_Enviroment_Wall_03
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 6975932406742899479}
   - component: {fileID: 3915682874678824402}
   - component: {fileID: 1486144763176289881}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Wall_Top.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}

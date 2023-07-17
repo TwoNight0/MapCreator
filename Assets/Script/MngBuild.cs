@@ -115,13 +115,14 @@ public class MngBuild : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        objRotate();
+        objSetPosition();
     }
 
     private void FixedUpdate()
     {
         //objsMove();
-        testMove();
+        //testMove(0);
     }
 
     //나중에 게임시스템으로 변경
@@ -365,31 +366,90 @@ public class MngBuild : MonoBehaviour
         }
   
     }
-    private bool _moveToPoint = true;
-    private void testMove()
+    private void testMove(int _num)
     {
-        Vector3 dir = Input.mousePosition - mouseObj.transform.position; // 방향 벡터구하기
-        dir.y = 0.0f;
-        if (_moveToPoint)
+        switch (_num)
         {
-            if (dir.magnitude > 0.01f) //목적지까지 도착하면 _moveToDest종료
-            {
-                _moveToPoint = false;
+            //screenToWorldPoint 사용. 문제점 조작감이 이상함
+            case 0:
+            { 
+                //Vector3 movePoint = Input.mousePosition;
+                Vector3 mousePoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
+                mousePoint.z = mousePoint.z + 280;
+                Debug.Log(mousePoint);
+                Vector3 moveVector = new Vector3(mousePoint.x, 0, -mousePoint.z);
+                mouseObj.transform.position = moveVector;
+
             }
+            break;
+            //ray사용
+            case 1:
+                {
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit)) {
+                        //맞은 물체의 월드포지션을 가져옴
+                        Debug.Log(hit.transform.position);
+                    }
+                    //Debug.Log(ray);
+            }
+            break;
         }
-        else
-        {
-            float moveDestPos = Mathf.Clamp(5 * Time.deltaTime, 0, dir.magnitude);
 
-            mouseObj.transform.position += dir.normalized * moveDestPos;
-           
-            
-        }
     }
-
 
     //마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
     private void objRotate()
+    {
+        float add = 0;
+        if (mouseObj.transform.childCount > 0 && Input.GetKeyDown(KeyCode.R))
+        {
+            GameObject tmp = mouseObj.transform.GetChild(0).gameObject;
+            add += 90;
+            Vector3 tmpV = new Vector3(0, add, 0);
+            tmp.transform.Rotate(tmpV);
+        }
+    }
+
+    /// <summary>
+    /// 마우스 왼쪽을 누르면
+    /// 아래오브젝트의 tag에 따라 map의 sub를 만들고 그 아래에 물체를 두고 부모를 설정
+    /// 즉 부모변경하는 메소드
+    /// </summary>
+    private void objSetPosition() { 
+        //mouseobj의 자식이 있고 왼쪽 클릭했을시
+        if(mouseObj.transform.childCount > 0 && Input.GetMouseButton(0))
+        {
+            GameObject tmp = mouseObj.transform.GetChild(0).gameObject;
+            GameObject Map = GameObject.Find("Map");
+
+            switch (tmp.layer)
+            {
+                //wall
+                case 7:
+                    {
+                        GameObject Wall = Map.transform.GetChild(1).gameObject;
+                        GameObject subWall = new GameObject();
+                        subWall.transform.parent = Wall.transform;
+
+                        tmp.transform.parent = subWall.transform;
+                    }
+                    break;
+                //deco
+                case 8: 
+                    { 
+                    
+                    }
+                    break;
+                default: break;
+
+            }
+        }
+    
+    }
+
+    //자식이 없을때 그 물체를 클릭하면 오브젝트를 mouseobj의 하위오브젝트로 만들어주는 함수
+    private void objPutOn()
     {
 
     }
