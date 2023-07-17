@@ -120,8 +120,8 @@ public class MngBuild : MonoBehaviour
 
     private void FixedUpdate()
     {
-        objsMove();
-
+        //objsMove();
+        testMove();
     }
 
     //나중에 게임시스템으로 변경
@@ -348,17 +348,45 @@ public class MngBuild : MonoBehaviour
     //마우스 오브젝트 이동
     private void objsMove()
     {
-        Vector3 Vmouse = new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y) ;
-        //Vector3 Vmouse = Input.mousePosition;
-        //Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //Debug.Log(worldPosition);
-
-        //Vector3 offset = Vmouse - worldPosition;
-        mouseObj.transform.position = Vmouse;
-        //mouseObj.transform.position = Vmouse;
-        //Camera.main.ScreenToWorldPoint();
-        //Debug.Log("마우스위치 : " + mouseObj.transform.position);
+        //#0
+        //Vector3 mousepos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        //Debug.Log(mousepos);
+        
+        if(mouseObj.transform.childCount > 0)
+        {
+            //#1
+            Vector3 mousepos = Input.mousePosition;
+            //Vector3 offset = mousepos - mouseObj.transform.position;
+            //Vector3 movethispoint = mousepos + offset;
+            Debug.Log("mousepos : "+ mousepos);
+            //Debug.Log("movepos : "+ movethispoint);
+            mouseObj.transform.position = new Vector3 (mousepos.x, 0, mousepos.y);
+            //mouseObj.transform.position = mousepos;
+        }
+  
     }
+    private bool _moveToPoint = true;
+    private void testMove()
+    {
+        Vector3 dir = Input.mousePosition - mouseObj.transform.position; // 방향 벡터구하기
+        dir.y = 0.0f;
+        if (_moveToPoint)
+        {
+            if (dir.magnitude > 0.01f) //목적지까지 도착하면 _moveToDest종료
+            {
+                _moveToPoint = false;
+            }
+        }
+        else
+        {
+            float moveDestPos = Mathf.Clamp(5 * Time.deltaTime, 0, dir.magnitude);
+
+            mouseObj.transform.position += dir.normalized * moveDestPos;
+           
+            
+        }
+    }
+
 
     //마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
     private void objRotate()
