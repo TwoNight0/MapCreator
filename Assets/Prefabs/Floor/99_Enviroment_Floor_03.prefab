@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 2536535064813921215}
   - component: {fileID: 1485148454354250778}
   - component: {fileID: 3708918731008743632}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 99_Enviroment_Floor_03
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

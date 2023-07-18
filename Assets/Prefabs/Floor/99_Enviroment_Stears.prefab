@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 1194006318026865800}
   - component: {fileID: 2827748188396401453}
   - component: {fileID: 61602024999864295}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: 99_Enviroment_Stears
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

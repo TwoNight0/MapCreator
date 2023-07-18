@@ -123,6 +123,7 @@ public class MngBuild : MonoBehaviour
     {
         //objsMove();
         testMove(0);
+        objPutOn();
     }
 
     //나중에 게임시스템으로 변경
@@ -315,12 +316,32 @@ public class MngBuild : MonoBehaviour
         {
             if(_tag == "Wall")
             {
+                GameObject subWall = new GameObject();
+                subWall.name = "subWall";
+                subWall.transform.parent = mouseObj.transform;
                 //오브젝트를 생성하고 마우스오브젝트를 부모로 만듬 
-                GameObject newObj = Instantiate(ListWall[_nameAsNum], mouseObj.transform);
+                GameObject newObj = Instantiate(ListWall[_nameAsNum], subWall.transform);
+
+                //콜라이더 만들어줘야함 
+                subWall.AddComponent<BoxCollider>();
+
+                //콜라이더 가져오기 
+                BoxCollider Cbox = subWall.GetComponent<BoxCollider>();
+
+                //콜라이더 사이즈 조절
+                Cbox.size = new Vector3(4, 5, 0.6f);
+
+                //콜라이더 위치 조절
+                Cbox.center = new Vector3(0, 2.55f, -2.33f);
+                
             }
             else if(_tag == "Decoration")
             {
-                GameObject newObj = Instantiate(ListDeco[_nameAsNum], mouseObj.transform);
+                GameObject subDeco = new GameObject();
+                subDeco.name = "subDeco";
+                subDeco.transform.parent = mouseObj.transform;
+
+                GameObject newObj = Instantiate(ListDeco[_nameAsNum], subDeco.transform);
             }
         }
         else
@@ -375,7 +396,7 @@ public class MngBuild : MonoBehaviour
                 {
                     Vector3 cursorPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
                     Vector3 moveToPoint = new Vector3(cursorPos.x, 0, -(cursorPos.y + 1080 / 2f));
-                    Debug.Log(moveToPoint);
+                    //Debug.Log(moveToPoint);
                     mouseObj.transform.position = moveToPoint;
                 }
             break;
@@ -434,33 +455,35 @@ public class MngBuild : MonoBehaviour
     /// </summary>
     private void objSetPosition() { 
         //mouseobj의 자식이 있고 왼쪽 클릭했을시
-        if(mouseObj.transform.childCount > 0 && Input.GetMouseButton(0))
+        if(mouseObj.transform.childCount > 0 && Input.GetMouseButton(1))
         {
-            GameObject tmp = mouseObj.transform.GetChild(0).gameObject;
+            //sub 실질적으로 Map 밑에 붙여서 넣어야하는 요소
+            GameObject sub = mouseObj.transform.GetChild(0).gameObject;
+            //실질적 오브젝트들의  정보파악용
+            GameObject tmp = sub.transform.GetChild(0).gameObject;
+
             GameObject Map = GameObject.Find("Map");
 
             switch (tmp.layer)
             {
+                case 6:
+                    {
+                        //sub의 부모만들어주기 (1)은 Wall
+                        sub.transform.parent = Map.transform.GetChild(0).gameObject.transform;
+                    }
+                    break;
                 //wall
                 case 7:
                     {
-                        GameObject Wall = Map.transform.GetChild(1).gameObject;
-                        GameObject subWall = new GameObject();
-                        subWall.name = "subWall";
-                        subWall.transform.parent = Wall.transform;
-
-                        tmp.transform.parent = subWall.transform;
+                        //sub의 부모만들어주기 (1)은 Wall
+                        sub.transform.parent = Map.transform.GetChild(1).gameObject.transform;
                     }
                     break;
                 //deco
                 case 8: 
                     {
-                        GameObject Deco = Map.transform.GetChild(2).gameObject;
-                        GameObject subDeco = new GameObject();
-                        subDeco.name = "subDeco";
-                        subDeco.transform.parent = Deco.transform;
-
-                        tmp.transform.parent = subDeco.transform;
+                        //sub의  부모만들어주기 (2)는 Deco임
+                        sub.transform.parent = Map.transform.GetChild(2).gameObject.transform;
                     }
                     break;
                 default: break;
@@ -473,7 +496,28 @@ public class MngBuild : MonoBehaviour
     //자식이 없을때 그 물체를 클릭하면 오브젝트를 mouseobj의 하위오브젝트로 만들어주는 함수
     private void objPutOn()
     {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
 
+        if (mouseObj.transform.childCount == 0 && Input.GetMouseButton(0)){
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.transform.name.Contains("sub"))
+                {
+                    Debug.Log(hit.transform.gameObject.name);
+                    hit.transform.parent = mouseObj.transform;
+                }
+                else
+                {
+                    Debug.Log(hit.transform.gameObject.name);
+                    GameObject subObj = hit.transform.parent.gameObject;
+                    Debug.Log(subObj);
+                    subObj.transform.parent = mouseObj.transform;
+                }
+
+            }
+        }
     }
 
 }

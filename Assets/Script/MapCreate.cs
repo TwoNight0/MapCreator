@@ -53,12 +53,6 @@ public class MapCreate : MonoBehaviour
     //오브젝트 고유번호
     private int objNum;
 
-    //벽을 안보이게 할때 사용
-    bool walloff;
-    bool Decooff;
-
-    [Tooltip("floor리스트의 최댓값")] private int max_Floor;
-    [Tooltip("wall리스트의 최댓값")] private int max_Wall;
 
     List<string> LoadLOLstr;
 
@@ -159,16 +153,9 @@ public class MapCreate : MonoBehaviour
         wall.transform.parent = map.transform;
         deco.transform.parent = map.transform;
 
-        //프리팹 수의 최대값(랜덤하게 프리팹을 쓰기위해 사용함)
-        max_Floor = objPrefabList_Floor.Count;
-        max_Wall = objPrefabList_Wall.Count;
-
         //타일 초기화
         TileSizeRow = 1;
         TileSizecolumn = 1;
-
-        //bool 초기화
-        walloff = true;
 
         LoadLOLstr = new List<string>();
 
@@ -384,8 +371,8 @@ public class MapCreate : MonoBehaviour
 
                 for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
                 {
-                    //오브젝트 생성 및 부모!설정 max_Floor 고쳐야함 
-                    GameObject obj = Instantiate(_PrefabList[Random.Range(0, max_Floor)], subObj.transform);
+                    //오브젝트 생성 및 부모!설정
+                    GameObject obj = Instantiate(_PrefabList[Random.Range(0, _PrefabList.Count)], subObj.transform);
 
                     //pos 조정
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
@@ -425,7 +412,7 @@ public class MapCreate : MonoBehaviour
                 for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
                 {
                     //오브젝트 생성 및 부모!설정 이부분 바꿔야함
-                    GameObject obj = Instantiate(_PrefabList[Random.Range(0, max_Floor)], subObj.transform);
+                    GameObject obj = Instantiate(_PrefabList[Random.Range(0, _PrefabList.Count)], subObj.transform);
 
                     //pos 조정
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
@@ -498,7 +485,7 @@ public class MapCreate : MonoBehaviour
             //Debug.Log(Vfloor);
 
             //오브젝트생성
-            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, max_Floor)], subFloor.transform);
+            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, objPrefabList_Floor.Count)], subFloor.transform);
 
             //위치지정
             obj.transform.position = Vfloor;
@@ -571,7 +558,7 @@ public class MapCreate : MonoBehaviour
             //Debug.Log(Vwall);
 
             //오브젝트생성
-            GameObject obj = Instantiate(objPrefabList_Wall[Random.Range(0, max_Wall)], subWall.transform);
+            GameObject obj = Instantiate(objPrefabList_Wall[Random.Range(0, objPrefabList_Wall.Count)], subWall.transform);
 
             //obj 위치지정
             obj.transform.position = Vwall;
@@ -593,12 +580,12 @@ public class MapCreate : MonoBehaviour
         BoxCollider Cbox = subWall.GetComponent<BoxCollider>();
 
         //콜라이더 사이즈 조절
-        Cbox.size = new Vector3(TileSizeRow * prefabSize, sizeY, sizeZ);
+        Cbox.size = new Vector3(TileSizeRow * prefabSize, sizeY * 2.3f, sizeZ);
 
         //콜라이더 위치 조절
         //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
-        Cbox.center = new Vector3(((TileSizeRow * prefabSize / 2) - (prefabSize / 2)),
-             sizeY / (prefabSize / 2),
+        Cbox.center = new Vector3(((TileSizeRow * prefabSize/2) - (prefabSize / 2)),
+             (sizeY / prefabSize) +2,
              -(prefabSize / 2) - (sizeZ / 2));
 
         //((TileSizeX * prefabSize / 2) - (prefabSize / 2))
@@ -607,21 +594,5 @@ public class MapCreate : MonoBehaviour
     }
     #endregion
 
-    public void wallinvisible()
-    {
-        walloff = !walloff;
-        wall.SetActive(walloff);
-        
-        //wall 아래 sub 아래 wall의 render들을 가져온다음 그것들의 알파도를 건들여야함
-        
-        if(wall.transform.childCount > 0) //서브가있는지 확인해야해
-        {
-            int wall;
-
-
-        }
-
-
-    }
 
 }
