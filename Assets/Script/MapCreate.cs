@@ -383,7 +383,20 @@ public class MapCreate : MonoBehaviour
                     //layer 레이어
                     obj.layer = tmp[k].LayerNum;
                 }
+                //콜라이더 만들기
+                subObj.AddComponent<BoxCollider>();
 
+                //콜라이더 가져오기
+                BoxCollider Cbox = subObj.GetComponent<BoxCollider>();
+
+                //콜라이더 사이즈 조절
+                Cbox.size = new Vector3(TileSizecolumn * prefabSize, 0, TileSizeRow * prefabSize);
+
+                //콜라이더 위치 조절
+                //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
+                Cbox.center = new Vector3(((TileSizecolumn * prefabSize / 2) - (prefabSize / 2)),
+                    0,
+                    ((TileSizeRow * prefabSize / 2) - (prefabSize / 2)));
             }
         }  
         else
@@ -423,8 +436,23 @@ public class MapCreate : MonoBehaviour
                     //layer 레이어
                     obj.layer = tmp[k].LayerNum;
                 }
+                //콜라이더 만들기
+                subObj.AddComponent<BoxCollider>();
 
+                //콜라이더 가져오기
+                BoxCollider Cbox = subObj.GetComponent<BoxCollider>();
+
+                //콜라이더 사이즈 조절
+                Cbox.size = new Vector3(TileSizecolumn * prefabSize, 0, TileSizeRow * prefabSize);
+
+                //콜라이더 위치 조절
+                //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
+                Cbox.center = new Vector3(((TileSizecolumn * prefabSize / 2) - (prefabSize / 2)),
+                    0,
+                    ((TileSizeRow * prefabSize / 2) - (prefabSize / 2)));
             }
+            
+
         }
         else
         {
