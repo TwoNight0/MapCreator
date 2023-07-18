@@ -118,11 +118,11 @@ public class MngBuild : MonoBehaviour
         objRotate();
         objSetPosition();
     }
-
+              
     private void FixedUpdate()
     {
         //objsMove();
-        //testMove(0);
+        testMove(0);
     }
 
     //나중에 게임시스템으로 변경
@@ -372,15 +372,12 @@ public class MngBuild : MonoBehaviour
         {
             //screenToWorldPoint 사용. 문제점 조작감이 이상함
             case 0:
-            { 
-                //Vector3 movePoint = Input.mousePosition;
-                Vector3 mousePoint = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
-                mousePoint.z = mousePoint.z + 280;
-                Debug.Log(mousePoint);
-                Vector3 moveVector = new Vector3(mousePoint.x, 0, -mousePoint.z);
-                mouseObj.transform.position = moveVector;
-
-            }
+                {
+                    Vector3 cursorPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
+                    Vector3 moveToPoint = new Vector3(cursorPos.x, 0, -(cursorPos.y + 1080 / 2f));
+                    Debug.Log(moveToPoint);
+                    mouseObj.transform.position = moveToPoint;
+                }
             break;
             //ray사용
             case 1:
@@ -392,8 +389,27 @@ public class MngBuild : MonoBehaviour
                         Debug.Log(hit.transform.position);
                     }
                     //Debug.Log(ray);
-            }
-            break;
+                }
+                break;
+            case 2:
+                {
+                    Vector3 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(-Input.mousePosition.x, 0, Input.mousePosition.y));
+                    mousePosition.z -= 200f;
+                    //Debug.Log(mousePosition);
+
+                    Vector3 moveVector = mousePosition - mouseObj.transform.position;
+                    moveVector.y = 0.0f;
+                    float moveSpeed = 1f; // 이동 속도를 조정할 수 있는 값
+
+                    mouseObj.transform.position += moveVector * moveSpeed * Time.deltaTime;
+                }
+                break;
+            case 3:
+                {
+                    
+                }
+                break;
+
         }
 
     }
@@ -430,6 +446,7 @@ public class MngBuild : MonoBehaviour
                     {
                         GameObject Wall = Map.transform.GetChild(1).gameObject;
                         GameObject subWall = new GameObject();
+                        subWall.name = "subWall";
                         subWall.transform.parent = Wall.transform;
 
                         tmp.transform.parent = subWall.transform;
@@ -437,8 +454,13 @@ public class MngBuild : MonoBehaviour
                     break;
                 //deco
                 case 8: 
-                    { 
-                    
+                    {
+                        GameObject Deco = Map.transform.GetChild(2).gameObject;
+                        GameObject subDeco = new GameObject();
+                        subDeco.name = "subDeco";
+                        subDeco.transform.parent = Deco.transform;
+
+                        tmp.transform.parent = subDeco.transform;
                     }
                     break;
                 default: break;
