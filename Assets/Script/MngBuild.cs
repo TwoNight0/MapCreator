@@ -397,6 +397,9 @@ public class MngBuild : MonoBehaviour
                     Vector3 cursorPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
                     Vector3 moveToPoint = new Vector3(cursorPos.x, 0, -(cursorPos.y + 1080 / 2f));
                     //Debug.Log(moveToPoint);
+                    //정수형태로 이동하게하여 딱 맞아떨어지게함
+                    moveToPoint.x = Mathf.Floor(moveToPoint.x);
+                    moveToPoint.z = Mathf.Floor(moveToPoint.z);
                     mouseObj.transform.position = moveToPoint;
                 }
             break;

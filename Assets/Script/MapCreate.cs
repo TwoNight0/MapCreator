@@ -16,7 +16,8 @@ public class MapData
     public float x,y,z;
     public int LayerNum = 6;
     public string tagName = "";
-    
+    public string prefabName = "";
+
     public void printData()
     {
         Debug.Log("TagName : " + tagName);
@@ -30,6 +31,7 @@ public class MapCreate : MonoBehaviour
     [Header("프리팹 리스트")] //프리팹리스트
     [SerializeField, Tooltip("바닥에 사용될 프리팹")] private List<GameObject> objPrefabList_Floor;
     [SerializeField, Tooltip("벽에 사용될 프리팹")] private List<GameObject> objPrefabList_Wall;
+    [SerializeField, Tooltip("데코에 사용될 프리팹")] private List<GameObject> objPrefabList_Deco; 
     [Space(20)]
 
     //최상위(root)
@@ -277,6 +279,7 @@ public class MapCreate : MonoBehaviour
                         data.y = Object.transform.position.y;
                         data.z = Object.transform.position.z;
 
+                        data.prefabName = Object.name;
                         data.tagName = Object.transform.tag;
                         data.LayerNum = Object.layer;
 
@@ -314,7 +317,7 @@ public class MapCreate : MonoBehaviour
     {
         LoadMapRandom(floor, "subFloor", objPrefabList_Floor);
         LoadMapRandom(wall, "subWall", objPrefabList_Wall);
-        //LoadMap(deco, "subDeco");
+        LoadMap(deco, "subDeco", objPrefabList_Deco);
     }
 
     #region Load
@@ -352,7 +355,7 @@ public class MapCreate : MonoBehaviour
     }
 
     /// <summary>
-    /// 리스트를 바탕으로 오브젝트를 생성
+    /// 리스트를 바탕으로 "랜덤" 오브젝트를 생성
     /// </summary>
     private void LoadMapCreateRandom(GameObject _nodeName, string _name, List<string> _LoadLOLstr, List<GameObject> _PrefabList) 
     {
@@ -372,11 +375,13 @@ public class MapCreate : MonoBehaviour
 
                 for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
                 {
-                    //오브젝트 생성 및 부모!설정
-                    GameObject obj = Instantiate(_PrefabList[Random.Range(0, _PrefabList.Count)], subObj.transform);
+                    //#0 프리팹폴더를 Resource 폴더에 넣지 않았을때 
+                    GameObject obj = Instantiate(_PrefabList[k], subObj.transform);
 
-                    //pos 조정
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
+
+                    //이름 설정
+                    obj.name = tmp[k].prefabName;
 
                     //tag 태그
                     obj.transform.tag = tmp[k].tagName;
@@ -425,11 +430,19 @@ public class MapCreate : MonoBehaviour
 
                 for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
                 {
+                    //프리팹 찾기
+                    string prefabStringOrigin = tmp[k].prefabName;
+                    //(clone) 제거 
+                    string result = prefabStringOrigin.Substring(0, tmp[k].prefabName.Length - 7);
+
                     //오브젝트 생성 및 부모!설정 이부분 바꿔야함
-                    GameObject obj = Instantiate(_PrefabList[Random.Range(0, _PrefabList.Count)], subObj.transform);
+                    GameObject obj = Instantiate(FindObjectInList(_PrefabList, result), subObj.transform);
 
                     //pos 조정
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
+
+                    //이름 설정
+                    obj.name = tmp[k].prefabName;
 
                     //tag 태그
                     obj.transform.tag = tmp[k].tagName;
@@ -461,6 +474,16 @@ public class MapCreate : MonoBehaviour
         }
 
     }
+
+    private GameObject FindObjectInList(List<GameObject> _List, string _name)
+    {
+
+
+        GameObject result = new GameObject();
+        return result;
+    }
+
+
     #endregion
 
     #region  create
