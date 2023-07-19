@@ -50,9 +50,6 @@ public class MapCreate : MonoBehaviour
     public InputField InputRow;
     public InputField InputColumn;
 
-    //오브젝트 고유번호
-    private int objNum;
-
 
     List<string> LoadLOLstr;
 
@@ -216,7 +213,10 @@ public class MapCreate : MonoBehaviour
                         data.y = Object.transform.position.y;
                         data.z = Object.transform.position.z;
 
+                        //태그저장
                         data.tagName = Object.transform.tag;
+
+                        //레이어 저장
                         data.LayerNum = Object.layer;
 
                         //제이슨 변환용 리스트에 담기
@@ -241,6 +241,7 @@ public class MapCreate : MonoBehaviour
     /// <param name="_nodeName"></param>
     private void SaveObj(GameObject _nodeName, List<string> _ListOfListStr)
     {
+        _ListOfListStr.Clear();
         // _nodeName == floor임
         // sub의 개수 
         int subCount = _nodeName.transform.childCount;
@@ -519,8 +520,9 @@ public class MapCreate : MonoBehaviour
             obj.transform.position = Vfloor;
 
             //오브젝트구분, 이름할당
-            obj.name = "floor" + objNum.ToString();
-            objNum++;
+     
+            obj.name = obj.name.ToString();
+   
 
             //태그 지정
             obj.tag = "Ground";
@@ -592,8 +594,7 @@ public class MapCreate : MonoBehaviour
             obj.transform.position = Vwall;
 
             //오브젝트구분 
-            obj.name = "wall" + objNum.ToString();
-            objNum++;
+            obj.name = obj.name.ToString();
 
             //태그 지정
             obj.tag = "Wall";
