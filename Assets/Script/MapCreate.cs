@@ -17,6 +17,7 @@ public class MapData
     public int LayerNum = 6;
     public string tagName = "";
     public string prefabName = "";
+    
 
     public void printData()
     {
@@ -51,7 +52,7 @@ public class MapCreate : MonoBehaviour
     //입력값
     public InputField InputRow;
     public InputField InputColumn;
-
+    
 
     List<string> LoadLOLstr;
 
@@ -307,11 +308,13 @@ public class MapCreate : MonoBehaviour
             string str = JsonConvert.SerializeObject(_ListOfListStr);
             //파일 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
+            MngLog.Instance.addLog(str+ "saved");
         }
         else //아무것도없을때 저장하면 제이슨을 초기화함
         {
             string str = null;
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
+            MngLog.Instance.addLog("noting to save");
         }
     }
     #endregion
