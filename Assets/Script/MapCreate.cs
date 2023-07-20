@@ -65,7 +65,7 @@ public class MapCreate : MonoBehaviour
 
     void Start()
     {
-        //test();
+        
 
 
     }
@@ -75,8 +75,8 @@ public class MapCreate : MonoBehaviour
 
     }
 
-    
 
+    #region testing
     private void test()
     {
         List<MapData> testList = new List<MapData>();
@@ -124,6 +124,15 @@ public class MapCreate : MonoBehaviour
 
         //AssetPreview.GetAssetPreview();
     }
+
+    private void testInstance()
+    {
+        int findIndex = FindObjectInList(objPrefabList_Deco, "01_DiningHall_01_WoodenChear#1");
+        GameObject obj = Instantiate(objPrefabList_Deco[findIndex]);
+        obj.name = "잘됬나";
+    }
+
+    #endregion
 
     //초기화
     private void initData() 
@@ -435,8 +444,9 @@ public class MapCreate : MonoBehaviour
                     //(clone) 제거 
                     string result = prefabStringOrigin.Substring(0, tmp[k].prefabName.Length - 7);
 
+                    int index = FindObjectInList(_PrefabList, result);
                     //오브젝트 생성 및 부모!설정 이부분 바꿔야함
-                    GameObject obj = Instantiate(FindObjectInList(_PrefabList, result), subObj.transform);
+                    GameObject obj = Instantiate(_PrefabList[index], subObj.transform);
 
                     //pos 조정
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
@@ -475,12 +485,20 @@ public class MapCreate : MonoBehaviour
 
     }
 
-    private GameObject FindObjectInList(List<GameObject> _List, string _name)
+    private int FindObjectInList(List<GameObject> _List, string _name)
     {
+        int cnt = _List.Count;
+        int resultIndex = -1;
+        for(int  i =  0; i<cnt; i++)
+        {
+            if (_List[i].name == _name)
+            {
+                resultIndex = i;
+            }
 
+        }
 
-        GameObject result = new GameObject();
-        return result;
+        return resultIndex;
     }
 
 

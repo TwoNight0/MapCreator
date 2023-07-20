@@ -48,6 +48,9 @@ public class MngBuild : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Confined;
+
+
         //이미지 뽑는 함수
         //getPrefabTexture(ListDeco, Deco);
 
@@ -122,7 +125,7 @@ public class MngBuild : MonoBehaviour
     private void FixedUpdate()
     {
         //objsMove();
-        testMove(0);
+        testMove(1);
         objPutOn();
     }
 
@@ -411,6 +414,13 @@ public class MngBuild : MonoBehaviour
                     if (Physics.Raycast(ray, out hit)) {
                         //맞은 물체의 월드포지션을 가져옴
                         Debug.Log(hit.transform.position);
+                    }
+                    else
+                    {
+                        Vector3 movePoint = ray.GetPoint(10.0f);
+                        movePoint.y = 0;
+                        //Debug.Log(movePoint * 8);
+                        mouseObj.transform.position = movePoint * 8;
                     }
                     //Debug.Log(ray);
                 }
