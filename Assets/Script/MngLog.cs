@@ -69,7 +69,6 @@ public class MngLog : MonoBehaviour
             countLog = 0;
         }
     }
-
     public void test()
     {
         GameObject log = new GameObject();

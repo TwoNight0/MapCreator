@@ -124,17 +124,10 @@ public class MngBuild : MonoBehaviour
               
     private void FixedUpdate()
     {
-        //objsMove();
-        testMove(1);
+        objectMove(3);
         objPutOn();
     }
-
-    //나중에 게임시스템으로 변경
-    public void UpdataBtnAction()
-    {
-        
-    }
-    
+ 
   
     /// <summary>
     /// 버튼 스위치
@@ -228,8 +221,6 @@ public class MngBuild : MonoBehaviour
 
         }
     }
-
-
 
     /// <summary>
     /// 프리팹에서 이미지 뽑아오는 함수
@@ -354,8 +345,6 @@ public class MngBuild : MonoBehaviour
         }
     }
 
-
-
     /// <summary>
     /// 누르면 오브젝트의 정보를 가져오는 함수
     /// </summary>
@@ -371,27 +360,11 @@ public class MngBuild : MonoBehaviour
 
     }
 
-    //마우스 오브젝트 이동
-    private void objsMove()
-    {
-        //#0
-        //Vector3 mousepos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        //Debug.Log(mousepos);
-        
-        if(mouseObj.transform.childCount > 0)
-        {
-            //#1
-            Vector3 mousepos = Input.mousePosition;
-            //Vector3 offset = mousepos - mouseObj.transform.position;
-            //Vector3 movethispoint = mousepos + offset;
-            Debug.Log("mousepos : "+ mousepos);
-            //Debug.Log("movepos : "+ movethispoint);
-            mouseObj.transform.position = new Vector3 (mousepos.x, 0, mousepos.y);
-            //mouseObj.transform.position = mousepos;
-        }
-  
-    }
-    private void testMove(int _num)
+    /// <summary>
+    /// 마우스를 통해 오브젝트 이동
+    /// </summary>
+    /// <param name="_num"></param>
+    private void objectMove(int _num)
     {
         switch (_num)
         {
@@ -448,8 +421,9 @@ public class MngBuild : MonoBehaviour
         }
 
     }
-
-    //마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
+    /// <summary>
+    /// 마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
+    /// </summary>
     private void objRotate()
     {
         float add = 0;
@@ -507,7 +481,9 @@ public class MngBuild : MonoBehaviour
     
     }
 
-    //자식이 없을때 그 물체를 클릭하면 오브젝트를 mouseobj의 하위오브젝트로 만들어주는 함수
+    /// <summary>
+    /// 자식이 없을때 그 물체를 클릭하면 오브젝트를 mouseobj의 하위오브젝트로 만들어주는 함수
+    /// </summary>
     private void objPutOn()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
