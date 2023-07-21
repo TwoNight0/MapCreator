@@ -15,6 +15,7 @@ public class MngCamera : MonoBehaviour
     void Start()
     {
         camPosY = 50;
+        
     }
 
     // Update is called once per frame

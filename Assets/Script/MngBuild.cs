@@ -415,21 +415,25 @@ public class MngBuild : MonoBehaviour
                         }
                     }
                     break;
-                //수학으로 풀었다..
+                //수학으로 풀었다.. 스크린값과 월드포지션의 비례식으로 품
                 //only mouse point 화면해상도와 어디까지 오브젝트가 보이는지를알아야함 1920 x 1080 에서는 월드포지션 50, 28까지보임 screen.with
                 case 2:
                     {
                         //인풋포지션 왼쪽하단이 0,0
                         Vector2 mouseInput = Input.mousePosition;
-                        //Debug.Log(mouseInput);
-                        float resultx = (mouseInput.x - 960.0f) * 50 / 960.0f; ;
-                        float resulty = (mouseInput.y - 540.0f) * 28 / 540.0f;
+                        float width = Screen.width / 2;
+                        float height = Screen.height / 2;
 
+                        float y = Camera.main.transform.position.y * height / width;
+
+                        float resultx = ((mouseInput.x  - width) * Camera.main.transform.position.y) / width; 
+                        float resulty = ((mouseInput.y  - height) * y) / height;
+                         
                         mouseObj.transform.position = new Vector3(resultx, 0, resulty);
 
                     }
                     break;
-                case 5:
+                case 3:
                     {
                         
                     }
