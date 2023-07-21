@@ -324,7 +324,7 @@ public class MngBuild : MonoBehaviour
                 subWall.transform.parent = mouseObj.transform;
                 //오브젝트를 생성하고 마우스오브젝트를 부모로 만듬 
                 GameObject newObj = Instantiate(ListWall[_nameAsNum], subWall.transform);
-
+                MngLog.Instance.addLog(newObj.name + "을 생성했습니다");
                 //콜라이더 만들어줘야함 
                 subWall.AddComponent<BoxCollider>();
 
@@ -345,6 +345,7 @@ public class MngBuild : MonoBehaviour
                 subDeco.transform.parent = mouseObj.transform;
 
                 GameObject newObj = Instantiate(ListDeco[_nameAsNum], subDeco.transform);
+                MngLog.Instance.addLog(newObj.name + "을 생성했습니다");
             }
         }
         else

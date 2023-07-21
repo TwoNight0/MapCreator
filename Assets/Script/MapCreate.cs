@@ -184,68 +184,6 @@ public class MapCreate : MonoBehaviour
     }
 
     #region Save
-    /// <summary>
-    /// 사용x 예전 세이브 버전
-    /// 저장할때 오브젝트들을 가져오고 그 오브젝트의 정보들을 담을 mapdata 데이터를 만들고 
-    /// 담고 리스트에 넣고 그 리스트를 저장!
-    /// 문제점 : 서브오브젝트 하나에 모든 오브젝트를 다 때려넣어서 부분별로 움직이기가 쉽지 않음
-    /// </summary>
-    /// <param name="_nodeName">큰 노드</param>
-    private void SaveObj(GameObject _nodeName)
-    {
-        // _nodeName == floor임
-        // sub의 개수 
-        int subCount = _nodeName.transform.childCount;
-        //subObj들이 담겨있는 리스트
-
-        if (subCount > 0) //sub의개수가 1개이상일때 작동
-        {
-            //floor 들의 정보를 담을 리스트 추후 제이슨으로 변환예정
-            List<MapData> tempList = new List<MapData>();
-
-            for (int i = 0; i < subCount; i++)
-            {
-                //subobj들 가져옴
-                Transform subTransform = _nodeName.transform.GetChild(i); 
-                GameObject subObject = subTransform.gameObject;
-
-                int objectCount = subObject.transform.childCount;
-
-                if(objectCount > 0)
-                {
-                    for (int k = 0; k < objectCount; k++)
-                    {
-                        Transform objTransform = subObject.transform.GetChild(k);
-                        GameObject Object = objTransform.gameObject;
-
-                        //담을 데이터 생성
-                        MapData data = new MapData();
-
-                        data.x = Object.transform.position.x;
-                        data.y = Object.transform.position.y;
-                        data.z = Object.transform.position.z;
-
-                        //태그저장
-                        data.tagName = Object.transform.tag;
-
-                        //레이어 저장
-                        data.LayerNum = Object.layer;
-
-                        //제이슨 변환용 리스트에 담기
-                        tempList.Add(data);
-
-                    }
-                }
-            }
-
-            //제이슨 저장
-            string str = JsonConvert.SerializeObject(tempList);
-
-            //파일 저장
-            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
-        }
-    }
-
     //overloading
     /// <summary>
     /// subObject를 구분해서 만들어 주고 그 밑에 데이터를 넣음
@@ -308,13 +246,13 @@ public class MapCreate : MonoBehaviour
             string str = JsonConvert.SerializeObject(_ListOfListStr);
             //파일 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
-            MngLog.Instance.addLog(str+ "saved");
+            MngLog.Instance.addLog(_nodeName + "이 저장되었습니다");
         }
         else //아무것도없을때 저장하면 제이슨을 초기화함
         {
             string str = null;
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
-            MngLog.Instance.addLog("noting to save");
+            MngLog.Instance.addLog(_nodeName + "저장할 오브젝트가 없습니다");
         }
     }
     #endregion
@@ -352,6 +290,7 @@ public class MapCreate : MonoBehaviour
 
 
         LoadMapCreateRandom(_nodeName, _name, LoadLOLstr, _PrefabList);
+        MngLog.Instance.addLog(_name + ": 불러오기 완료");
     }
 
     private void LoadMap(GameObject _nodeName, string _name, List<GameObject> _PrefabList)
@@ -364,6 +303,7 @@ public class MapCreate : MonoBehaviour
 
 
         LoadMapCreate(_nodeName, _name, LoadLOLstr, _PrefabList);
+        MngLog.Instance.addLog(_name + ": 불러오기 완료");
     }
 
     /// <summary>
@@ -419,7 +359,8 @@ public class MapCreate : MonoBehaviour
         }  
         else
         {
-            Debug.Log(_name + ": " + "불러올 내용이 없습니다");
+            Debug.Log(_name + ": 불러올 내용이 없습니다");
+            MngLog.Instance.addLog(_name + ": 불러올 내용이 없습니다");
         }
       
     }
@@ -592,6 +533,10 @@ public class MapCreate : MonoBehaviour
         //다시 사용하기 위한 초기화
         TileSizeRow = 1;
         TileSizecolumn = 1;
+
+        //Log
+        MngLog.Instance.addLog(TileSizeRow + "x"  + TileSizecolumn + " 크기의 floor를  생성했습니다." );
+
     }
 
     /// <summary>
@@ -664,6 +609,9 @@ public class MapCreate : MonoBehaviour
         //((TileSizeX * prefabSize / 2) - (prefabSize / 2))
         //다시 사용하기 위한 초기화
         TileSizeRow = 1;
+
+        //Log
+        MngLog.Instance.addLog(TileSizeRow + "x 1 크기의 wall을  생성했습니다.");
     }
     #endregion
 

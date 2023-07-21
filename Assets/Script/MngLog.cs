@@ -8,7 +8,9 @@ public class MngLog : MonoBehaviour
     static public MngLog Instance;
 
     public GameObject logParent;
-    public TMP_FontAsset NotoSansFont; 
+    public TMP_FontAsset NotoSansFont;
+
+    public int MaxLog;
 
     private void Awake()
     {
@@ -25,6 +27,8 @@ public class MngLog : MonoBehaviour
     private void Start()
     {
         test();
+        test();
+        Deletelog();
     }
 
     public void addLog(string _systemMessage)
@@ -36,6 +40,10 @@ public class MngLog : MonoBehaviour
         log.AddComponent<TextMeshProUGUI>();
 
         TextMeshProUGUI logText = log.GetComponent<TextMeshProUGUI>();
+        logText.font = NotoSansFont;
+        logText.rectTransform.sizeDelta = new Vector2(1200, 50);
+
+        
         logText.text = _systemMessage;
     }
 
@@ -49,14 +57,21 @@ public class MngLog : MonoBehaviour
 
         TextMeshProUGUI logText = log.GetComponent<TextMeshProUGUI>();
         logText.font = NotoSansFont;
-        // Apply the changes
-        logText.UpdateFontAsset();
-        logText.ForceMeshUpdate();
 
         logText.text = "한글되나?";
 
         
         
+    }
+
+    public void Deletelog()
+    {
+        if(logParent.transform.childCount > 0)
+        {
+            Destroy(logParent.transform.GetChild(0).gameObject);
+        }
+
+
     }
     
 
