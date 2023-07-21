@@ -42,9 +42,6 @@ public class MngBuild : MonoBehaviour
     //Transform
     GameObject contents;
 
-    public GameObject plane;
-    private Collider planeCollider;
-
     private void Awake()
     {
         initMng();
@@ -84,10 +81,6 @@ public class MngBuild : MonoBehaviour
         BtnState = BtnSelected.Deco;
         BtnSwitch();
 
-
-
-        //test
-        planeCollider = plane.GetComponent<Collider>();
 
     }
 
@@ -130,7 +123,7 @@ public class MngBuild : MonoBehaviour
               
     private void FixedUpdate()
     {
-        objectMove(3);
+        objectMove(1);
         objPutOn();
     }
  
@@ -340,7 +333,7 @@ public class MngBuild : MonoBehaviour
                 GameObject subDeco = new GameObject();
                 subDeco.name = "subDeco";
                 subDeco.transform.parent = mouseObj.transform;
-
+                Debug.Log(subDeco.transform.position);
                 GameObject newObj = Instantiate(ListDeco[_nameAsNum], subDeco.transform);
                 MngLog.Instance.addLog(newObj.name + "을 생성했습니다");
             }
@@ -381,64 +374,70 @@ public class MngBuild : MonoBehaviour
                 //screenToWorldPoint 사용. 문제점 조작감이 이상함
                 case 0:
                     {
-                        Debug.Log("서브오브젝트 : " + mouseObj.transform.GetChild(0).gameObject.name);
-                        Vector3 cursorPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
-                        Vector3 moveToPoint = new Vector3(cursorPos.x, 0, -(cursorPos.y + 1080 / 2f));
-                        //Debug.Log(moveToPoint);
-                        //정수형태로 이동하게하여 딱 맞아떨어지게함
-                        moveToPoint.x = Mathf.Floor(moveToPoint.x);
-                        moveToPoint.z = Mathf.Floor(moveToPoint.z);
-                        mouseObj.transform.position = moveToPoint;
+                        Vector3 mousePosition = Input.mousePosition;
+                        mousePosition.z = Camera.main.transform.position.y;
+                        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+                        worldPosition.y = 0;
+                        //int단위로 움직이게함
+                        worldPosition.x = Mathf.Floor(worldPosition.x);
+                        worldPosition.z = Mathf.Floor(worldPosition.z);
+
+                        mouseObj.transform.position = worldPosition;
+                        print(worldPosition);
                     }
                     break;         
-                //구분안하는 버전
+                //레이캐스트,GetPoint 사용
                 case 1:
                     {
-                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                        Vector3 movePoint = ray.GetPoint(raylength);
-                        movePoint.y = 0;
-                        //Debug.Log("맞은 오브젝트가 없음 : " + movePoint);
+                        Vector3 mousePosition = Input.mousePosition;
+                        mousePosition.z = Camera.main.transform.position.y;
+                        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
 
-                        mouseObj.transform.position = movePoint;
-                    }
-                    break;
-                //물체자체를 이동
-                case 2:
-                    {
-                        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(-Input.mousePosition.x, 0, Input.mousePosition.y));
-                        mousePosition.z -= 200f;
-                        //Debug.Log(mousePosition);
-
-                        Vector3 moveVector = mousePosition - mouseObj.transform.position;
-                        moveVector.y = 0.0f;
-                        float moveSpeed = 1f; // 이동 속도를 조정할 수 있는 값
-
-                        mouseObj.transform.position += moveVector * moveSpeed * Time.deltaTime;
-
-                    }
-                    break;
-                case 3:
-                    {
-                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                         RaycastHit hit;
-                        Debug.Log("오리지널 포지션" + ray.origin);
-                        
-                        if(Physics.Raycast(ray, out hit))
+                        if (Physics.Raycast(ray, out hit))
                         {
-                            if (hit.collider == planeCollider) {
-                                mouseObj.transform.position = hit.point;
-
+                            // 레이와 충돌하는 물체가 있다면 해당 위치로 mouseObj를 이동
+                            Vector3 movePoint = hit.point;
+                            movePoint.y = 0.0f;
+                            mouseObj.transform.position = movePoint;
+                        }
+                        else
+                        {
+                            // 레이와 충돌하는 물체가 없다면 카메라와 평행한 평면(예: 바닥)의 높이를 구해서 mouseObj를 이동
+                            Plane groundPlane = new Plane(Vector3.up, Vector3.zero); // 평면은 y축(normal)과 원점(point)으로 생성
+                            float rayDistance;
+                            if (groundPlane.Raycast(ray, out rayDistance))
+                            {
+                                Vector3 intersectionPoint = ray.GetPoint(rayDistance);
+                                intersectionPoint.y = 0;
+                                mouseObj.transform.position = intersectionPoint;
                             }
                         }
+                    }
+                    break;
+                //수학으로 풀었다..
+                //only mouse point 화면해상도와 어디까지 오브젝트가 보이는지를알아야함 1920 x 1080 에서는 월드포지션 50, 28까지보임 screen.with
+                case 2:
+                    {
+                        //인풋포지션 왼쪽하단이 0,0
+                        Vector2 mouseInput = Input.mousePosition;
+                        //Debug.Log(mouseInput);
+                        float resultx = (mouseInput.x - 960.0f) * 50 / 960.0f; ;
+                        float resulty = (mouseInput.y - 540.0f) * 28 / 540.0f;
 
+                        mouseObj.transform.position = new Vector3(resultx, 0, resulty);
+
+                    }
+                    break;
+                case 5:
+                    {
+                        
                     }
                     break;
             }
         }
         
     }
-
-
 
 
     /// <summary>
@@ -476,8 +475,9 @@ public class MngBuild : MonoBehaviour
             {
                 case 6:
                     {
-                        //sub의 부모만들어주기 (1)은 Wall
+                        //sub의 부모만들어주기 (0)은 Floor
                         sub.transform.parent = Map.transform.GetChild(0).gameObject.transform;
+                        
                     }
                     break;
                 //wall
@@ -485,6 +485,7 @@ public class MngBuild : MonoBehaviour
                     {
                         //sub의 부모만들어주기 (1)은 Wall
                         sub.transform.parent = Map.transform.GetChild(1).gameObject.transform;
+                       
                     }
                     break;
                 //deco
@@ -492,6 +493,7 @@ public class MngBuild : MonoBehaviour
                     {
                         //sub의  부모만들어주기 (2)는 Deco임
                         sub.transform.parent = Map.transform.GetChild(2).gameObject.transform;
+                        
                     }
                     break;
                 default: break;
