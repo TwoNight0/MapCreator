@@ -1022,7 +1022,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   logParent: {fileID: 250760656}
   NotoSansFont: {fileID: 11400000, guid: 73536596062023042831732bad0c7cfc, type: 2}
-  MaxLog: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -2484,6 +2483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2df16ec703fe6aa4bb0a8f6afd450768, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  raylength: 50
   ListFloor:
   - {fileID: 490313454677958679, guid: 0646289dde1e8a544800d3790d629971, type: 3}
   - {fileID: 3894254861789127725, guid: c894645c79a0f764ea20a47ea34a8ff9, type: 3}

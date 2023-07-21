@@ -16,6 +16,9 @@ public class MngBuild : MonoBehaviour
 
     BtnSelected BtnState;
 
+    //float
+    public float raylength;
+
     //GameObject
     private GameObject Right; //UI가 있는 영역
     private GameObject BtnLayer;
@@ -39,10 +42,12 @@ public class MngBuild : MonoBehaviour
     //Transform
     GameObject contents;
 
+    
 
     private void Awake()
     {
         initMng();
+        
     }
 
     // Start is called before the first frame update
@@ -78,7 +83,7 @@ public class MngBuild : MonoBehaviour
         BtnState = BtnSelected.Deco;
         BtnSwitch();
 
-
+        
 
         //test
 
@@ -124,7 +129,7 @@ public class MngBuild : MonoBehaviour
               
     private void FixedUpdate()
     {
-        objectMove(3);
+        objectMove(1);
         objPutOn();
     }
  
@@ -366,61 +371,65 @@ public class MngBuild : MonoBehaviour
     /// <param name="_num"></param>
     private void objectMove(int _num)
     {
-        switch (_num)
+        if(mouseObj.transform.childCount > 0)
         {
-            //screenToWorldPoint 사용. 문제점 조작감이 이상함
-            case 0:
-                {
-                    Vector3 cursorPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
-                    Vector3 moveToPoint = new Vector3(cursorPos.x, 0, -(cursorPos.y + 1080 / 2f));
-                    //Debug.Log(moveToPoint);
-                    //정수형태로 이동하게하여 딱 맞아떨어지게함
-                    moveToPoint.x = Mathf.Floor(moveToPoint.x);
-                    moveToPoint.z = Mathf.Floor(moveToPoint.z);
-                    mouseObj.transform.position = moveToPoint;
-                }
-            break;
-            //ray사용
-            case 1:
-                {
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    RaycastHit hit;
-                    if (Physics.Raycast(ray, out hit)) {
-                        //맞은 물체의 월드포지션을 가져옴
-                        Debug.Log(hit.transform.position);
-                    }
-                    else
+            raylength = Camera.main.transform.position.y + 10;
+            //Debug.Log(raylength);
+            switch (_num)
+            {
+                //screenToWorldPoint 사용. 문제점 조작감이 이상함
+                case 0:
                     {
-                        Vector3 movePoint = ray.GetPoint(10.0f);
-                        movePoint.y = 0;
-                        //Debug.Log(movePoint * 8);
-                        mouseObj.transform.position = movePoint * 8;
+                        Debug.Log("서브오브젝트 : " + mouseObj.transform.GetChild(0).gameObject.name);
+                        Vector3 cursorPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, 0, Input.mousePosition.y));
+                        Vector3 moveToPoint = new Vector3(cursorPos.x, 0, -(cursorPos.y + 1080 / 2f));
+                        //Debug.Log(moveToPoint);
+                        //정수형태로 이동하게하여 딱 맞아떨어지게함
+                        moveToPoint.x = Mathf.Floor(moveToPoint.x);
+                        moveToPoint.z = Mathf.Floor(moveToPoint.z);
+                        mouseObj.transform.position = moveToPoint;
                     }
-                    //Debug.Log(ray);
-                }
-                break;
-            case 2:
-                {
-                    Vector3 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(-Input.mousePosition.x, 0, Input.mousePosition.y));
-                    mousePosition.z -= 200f;
-                    //Debug.Log(mousePosition);
+                    break;         
+                //구분안하는 버전
+                case 1:
+                    {
+                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                        Vector3 movePoint = ray.GetPoint(raylength);
+                        movePoint.y = 0;
+                        //Debug.Log("맞은 오브젝트가 없음 : " + movePoint);
 
-                    Vector3 moveVector = mousePosition - mouseObj.transform.position;
-                    moveVector.y = 0.0f;
-                    float moveSpeed = 1f; // 이동 속도를 조정할 수 있는 값
+                        mouseObj.transform.position = movePoint;
+                    }
+                    break;
+                //물체자체를 이동
+                case 2:
+                    {
+                        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(new Vector3(-Input.mousePosition.x, 0, Input.mousePosition.y));
+                        mousePosition.z -= 200f;
+                        //Debug.Log(mousePosition);
 
-                    mouseObj.transform.position += moveVector * moveSpeed * Time.deltaTime;
-                }
-                break;
-            case 3:
-                {
-                    
-                }
-                break;
+                        Vector3 moveVector = mousePosition - mouseObj.transform.position;
+                        moveVector.y = 0.0f;
+                        float moveSpeed = 1f; // 이동 속도를 조정할 수 있는 값
 
+                        mouseObj.transform.position += moveVector * moveSpeed * Time.deltaTime;
+
+                    }
+                    break;
+                case 3:
+                    {
+                        
+
+                    }
+                    break;
+            }
         }
-
+        
     }
+
+
+
+
     /// <summary>
     /// 마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
     /// </summary>
