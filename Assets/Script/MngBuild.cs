@@ -42,7 +42,8 @@ public class MngBuild : MonoBehaviour
     //Transform
     GameObject contents;
 
-    
+    public GameObject plane;
+    private Collider planeCollider;
 
     private void Awake()
     {
@@ -83,10 +84,10 @@ public class MngBuild : MonoBehaviour
         BtnState = BtnSelected.Deco;
         BtnSwitch();
 
-        
+
 
         //test
-
+        planeCollider = plane.GetComponent<Collider>();
 
     }
 
@@ -129,7 +130,7 @@ public class MngBuild : MonoBehaviour
               
     private void FixedUpdate()
     {
-        objectMove(1);
+        objectMove(3);
         objPutOn();
     }
  
@@ -418,7 +419,17 @@ public class MngBuild : MonoBehaviour
                     break;
                 case 3:
                     {
+                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                        RaycastHit hit;
+                        Debug.Log("오리지널 포지션" + ray.origin);
                         
+                        if(Physics.Raycast(ray, out hit))
+                        {
+                            if (hit.collider == planeCollider) {
+                                mouseObj.transform.position = hit.point;
+
+                            }
+                        }
 
                     }
                     break;
