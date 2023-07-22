@@ -534,7 +534,7 @@ public class MapCreate : MonoBehaviour
         TileSizecolumn = 1;
 
         //Log
-        MngLog.Instance.addLog(TileSizeRow + "x"  + TileSizecolumn + " 크기의 floor를  생성했습니다." );
+        MngLog.Instance.addLog(resultIntX + " x "  + resultIntZ + " 크기의 floor를  생성했습니다." );
 
     }
 
@@ -610,7 +610,7 @@ public class MapCreate : MonoBehaviour
         TileSizeRow = 1;
 
         //Log
-        MngLog.Instance.addLog(TileSizeRow + "x 1 크기의 wall을  생성했습니다.");
+        MngLog.Instance.addLog(resultIntX + " x 1 크기의 wall을  생성했습니다.");
     }
     #endregion
 

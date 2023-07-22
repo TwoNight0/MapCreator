@@ -123,7 +123,7 @@ public class MngBuild : MonoBehaviour
               
     private void FixedUpdate()
     {
-        objectMove(1);
+        objectMove(0);
         objPutOn();
     }
  
@@ -333,7 +333,7 @@ public class MngBuild : MonoBehaviour
                 GameObject subDeco = new GameObject();
                 subDeco.name = "subDeco";
                 subDeco.transform.parent = mouseObj.transform;
-                Debug.Log(subDeco.transform.position);
+                //Debug.Log(subDeco.transform.position);
                 GameObject newObj = Instantiate(ListDeco[_nameAsNum], subDeco.transform);
                 MngLog.Instance.addLog(newObj.name + "을 생성했습니다");
             }
@@ -371,7 +371,7 @@ public class MngBuild : MonoBehaviour
             //Debug.Log(raylength);
             switch (_num)
             {
-                //screenToWorldPoint 사용. 문제점 조작감이 이상함
+                //screenToWorldPoint 사용.
                 case 0:
                     {
                         Vector3 mousePosition = Input.mousePosition;
@@ -382,7 +382,7 @@ public class MngBuild : MonoBehaviour
                         worldPosition.x = Mathf.Floor(worldPosition.x);
                         worldPosition.z = Mathf.Floor(worldPosition.z);
 
-                        mouseObj.transform.position = worldPosition;
+                        mouseObj.transform.GetChild(0).position = worldPosition;
                         print(worldPosition);
                     }
                     break;         
@@ -399,7 +399,8 @@ public class MngBuild : MonoBehaviour
                             // 레이와 충돌하는 물체가 있다면 해당 위치로 mouseObj를 이동
                             Vector3 movePoint = hit.point;
                             movePoint.y = 0.0f;
-                            mouseObj.transform.position = movePoint;
+                            //sub를 움직임
+                            mouseObj.transform.GetChild(0).position = movePoint;
                         }
                         else
                         {
@@ -410,30 +411,13 @@ public class MngBuild : MonoBehaviour
                             {
                                 Vector3 intersectionPoint = ray.GetPoint(rayDistance);
                                 intersectionPoint.y = 0;
-                                mouseObj.transform.position = intersectionPoint;
+                                //sub를 움직임
+                                mouseObj.transform.GetChild(0).position = intersectionPoint;
                             }
                         }
                     }
                     break;
-                //수학으로 풀었다.. 스크린값과 월드포지션의 비례식으로 품
-                //only mouse point 화면해상도와 어디까지 오브젝트가 보이는지를알아야함 1920 x 1080 에서는 월드포지션 50, 28까지보임 screen.with
                 case 2:
-                    {
-                        //인풋포지션 왼쪽하단이 0,0
-                        Vector2 mouseInput = Input.mousePosition;
-                        float width = Screen.width / 2;
-                        float height = Screen.height / 2;
-
-                        float y = Camera.main.transform.position.y * height / width;
-
-                        float resultx = ((mouseInput.x  - width) * Camera.main.transform.position.y) / width; 
-                        float resulty = ((mouseInput.y  - height) * y) / height;
-                         
-                        mouseObj.transform.position = new Vector3(resultx, 0, resulty);
-
-                    }
-                    break;
-                case 3:
                     {
                         
                     }
@@ -470,6 +454,7 @@ public class MngBuild : MonoBehaviour
         {
             //sub 실질적으로 Map 밑에 붙여서 넣어야하는 요소
             GameObject sub = mouseObj.transform.GetChild(0).gameObject;
+
             //실질적 오브젝트들의  정보파악용
             GameObject tmp = sub.transform.GetChild(0).gameObject;
 
@@ -481,7 +466,6 @@ public class MngBuild : MonoBehaviour
                     {
                         //sub의 부모만들어주기 (0)은 Floor
                         sub.transform.parent = Map.transform.GetChild(0).gameObject.transform;
-                        
                     }
                     break;
                 //wall
@@ -489,7 +473,6 @@ public class MngBuild : MonoBehaviour
                     {
                         //sub의 부모만들어주기 (1)은 Wall
                         sub.transform.parent = Map.transform.GetChild(1).gameObject.transform;
-                       
                     }
                     break;
                 //deco
@@ -497,7 +480,6 @@ public class MngBuild : MonoBehaviour
                     {
                         //sub의  부모만들어주기 (2)는 Deco임
                         sub.transform.parent = Map.transform.GetChild(2).gameObject.transform;
-                        
                     }
                     break;
                 default: break;
@@ -521,10 +503,12 @@ public class MngBuild : MonoBehaviour
             {
                 if (hit.transform.name.Contains("sub"))
                 {
-                    Debug.Log(hit.transform.gameObject.name);
+                    //Debug.Log(hit.transform.gameObject.name);
+                    //부모로 만듬
                     hit.transform.parent = mouseObj.transform;
+
                 }
-                else
+                else //이름에 sub가 안붙어있는 애들은 만들어서 넣어줌
                 {
                     Debug.Log(hit.transform.gameObject.name);
                     GameObject subObj = hit.transform.parent.gameObject;
