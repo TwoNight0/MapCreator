@@ -325,8 +325,7 @@ public class MngBuild : MonoBehaviour
                 Cbox.size = new Vector3(4, 5, 0.6f);
 
                 //콜라이더 위치 조절
-                Cbox.center = new Vector3(0, 2.55f, -2.33f);
-                
+                Cbox.center = new Vector3(0, 2.55f, -2.33f);   
             }
             else if(_tag == "Decoration")
             {
@@ -383,7 +382,7 @@ public class MngBuild : MonoBehaviour
                         worldPosition.z = Mathf.Floor(worldPosition.z);
 
                         mouseObj.transform.GetChild(0).position = worldPosition;
-                        print(worldPosition);
+                        //print(worldPosition);
                     }
                     break;         
                 //레이캐스트,GetPoint 사용
@@ -429,7 +428,7 @@ public class MngBuild : MonoBehaviour
 
 
     /// <summary>
-    /// 마우스에 있는 물체 회전(오브젝트 아래의 자손의 rotation을 변경해야함
+    /// 마우스에 있는 물체 회전(sub자체를 회전)
     /// </summary>
     private void objRotate()
     {
@@ -444,6 +443,7 @@ public class MngBuild : MonoBehaviour
     }
 
     /// <summary>
+    /// 오브젝트 내려놓기...
     /// 마우스 왼쪽을 누르면
     /// 아래오브젝트의 tag에 따라 map의 sub를 만들고 그 아래에 물체를 두고 부모를 설정
     /// 즉 부모변경하는 메소드
@@ -490,6 +490,7 @@ public class MngBuild : MonoBehaviour
     }
 
     /// <summary>
+    /// 오브젝트 들어올리기...
     /// 자식이 없을때 그 물체를 클릭하면 오브젝트를 mouseobj의 하위오브젝트로 만들어주는 함수
     /// </summary>
     private void objPutOn()

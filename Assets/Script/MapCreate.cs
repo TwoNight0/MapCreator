@@ -16,6 +16,8 @@ public class MapData
     //subPosition
     public float x,y,z;
 
+    public float rotation;
+
     // name(0) , 싱글에서 사용
     public string prefabName = "";
 
@@ -54,9 +56,6 @@ public class MapCreate : MonoBehaviour
     //입력값
     public InputField InputRow;
     public InputField InputColumn;
-    
-    //임시 데이터
-    List<string> LoadLOLstr;
 
     private void Awake()
     {
@@ -153,9 +152,6 @@ public class MapCreate : MonoBehaviour
         TileSizeRow = 1;
         TileSizecolumn = 1;
 
-        LoadLOLstr = new List<string>();
-
-
     }
     
     public void BtnSaveMap()
@@ -173,9 +169,6 @@ public class MapCreate : MonoBehaviour
     /// </summary>
     private void SaveObj(GameObject _nodeName)
     {
-        //저장전 초기화
-        LoadLOLstr.Clear();
-
         // _nodeName == floor임
         // sub의 개수 
         int subCount = _nodeName.transform.childCount;
@@ -200,6 +193,8 @@ public class MapCreate : MonoBehaviour
                 data.y = subObject.transform.position.y;
                 data.z = subObject.transform.position.z;
 
+                data.rotation = subObject.transform.eulerAngles.y;
+
                 //가로 세로 저장(콜라이더 크기 사용
                 //콜라이더 가져오기
                 BoxCollider collider = subObject.GetComponent<BoxCollider>();
@@ -223,13 +218,8 @@ public class MapCreate : MonoBehaviour
             //List<MapData> templist 제이슨화
             string tmp = JsonConvert.SerializeObject(tempList);
 
-            //제이슨 문자열(tmp)을 List<string>에 저장함
-            LoadLOLstr.Add(tmp);
-
-            //제이슨 문자열이 담긴 List str을 이중 제이슨 저장
-            string str = JsonConvert.SerializeObject(LoadLOLstr);
             //파일 저장
-            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
+            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", tmp);
             MngLog.Instance.addLog(_nodeName + "이 저장되었습니다");
         }
         else //저장시 sub노드가 없으면 아무것도 없는 빈문자열로 저장된 데이터를 초기화함
@@ -243,88 +233,40 @@ public class MapCreate : MonoBehaviour
 
     public void BtnLoadMap()
     {
-        //LoadMapRandom(floor, "subFloor", objPrefabList_Floor);
-        //LoadMapRandom(wall, "subWall", objPrefabList_Wall);
-        //LoadMap(deco, "subDeco", objPrefabList_Deco);
+        LoadMulti_Random(floor, "subFloor", objPrefabList_Floor);
+        LoadMulti_Random(wall, "subWall", objPrefabList_Wall);
+        LoadSingle(deco, "subDeco", objPrefabList_Deco);
     }
 
     #region Load
- 
-    private void LoadMapRandom(GameObject _nodeName, string _name, List<GameObject> _PrefabList)
-    { 
-        //3개의 정보를 다해야함
-        string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
-
-        LoadLOLstr = JsonConvert.DeserializeObject<List<string>>(str);
-        //LoadLOL = JsonUtility.FromJson<List<List<MapData>>>(str);
-
-
-        LoadMapCreateRandom(_nodeName, _name, LoadLOLstr, _PrefabList);
-        MngLog.Instance.addLog(_name + ": 불러오기 완료");
-    }
-
-    private void LoadMap(GameObject _nodeName, string _name, List<GameObject> _PrefabList)
-    {
-        //3개의 정보를 다해야함
-        string str = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
-
-        LoadLOLstr = JsonConvert.DeserializeObject<List<string>>(str);
-        //LoadLOL = JsonUtility.FromJson<List<List<MapData>>>(str);
-
-
-        LoadMapCreate(_nodeName, _name, LoadLOLstr, _PrefabList);
-        MngLog.Instance.addLog(_name + ": 불러오기 완료");
-    }
 
     /// <summary>
-    /// 리스트를 바탕으로 "랜덤" 오브젝트를 생성
+    /// 멀티 오브젝트 블러오기 및 생성
     /// </summary>
-    private void LoadMapCreateRandom(GameObject _nodeName, string _name, List<string> _LoadLOLstr, List<GameObject> _PrefabList) 
+    private void LoadMulti_Random(GameObject _nodeName, string _name, List<GameObject> _PrefabList) 
     {
+        //3개의 정보를 다해야함
+        string JsonStr = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
+
+        //List<MapData>
+        List<MapData> LoadListMapData = JsonConvert.DeserializeObject<List<MapData>>(JsonStr);
+        MngLog.Instance.addLog(_nodeName.name + ": 제이슨 불러오기 완료");
+
         //LOL의 크기가 1개이상일때 동작
-        if (_LoadLOLstr != null && _LoadLOLstr.Count > 0)
+        if (LoadListMapData != null && LoadListMapData.Count > 0)
         {
-            //리스트의 길이만큼 하나하나를 만들어야함
-            for (int i = 0; i < _LoadLOLstr.Count; i++)//subObj의 개수만큼임 하고있음
+            //List<MapData>의 개수만큼 돔
+            for (int i = 0; i < LoadListMapData.Count; i++)//subObj의 개수만큼임 하고있음
             {
-                //subObj 생성 및 이름 할당
-                GameObject subObj = new GameObject(_name);
-
-                //부모 만들어주기 floor를 subObj의 부모로 
-                subObj.transform.parent = _nodeName.transform;
-                //데이터 부분 (제이슨을 다시 풀어줌)
-                List<MapData> tmp = JsonConvert.DeserializeObject<List<MapData>>(_LoadLOLstr[i]);
-
-                for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
+                //col이 0보다 큼으로 바닥타일
+                if(LoadListMapData[i].col > 0)
                 {
-                    //#0 프리팹폴더를 Resource 폴더에 넣지 않았을때 
-                    GameObject obj = Instantiate(_PrefabList[k], subObj.transform);
-
-                    obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
-
-                    ////이름 설정
-                    //obj.name = tmp[k].prefabName;
-
-                    ////tag 태그
-                    //obj.transform.tag = tmp[k].tagName;
-
-                    ////layer 레이어
-                    //obj.layer = tmp[k].LayerNum;
+                    LoadCreateFloorTile(LoadListMapData[i].row, LoadListMapData[i].col, LoadListMapData[i].x, LoadListMapData[i].y, LoadListMapData[i].z, LoadListMapData[i].rotation);
                 }
-                //콜라이더 만들기
-                subObj.AddComponent<BoxCollider>();
-
-                //콜라이더 가져오기
-                BoxCollider Cbox = subObj.GetComponent<BoxCollider>();
-
-                //콜라이더 사이즈 조절
-                Cbox.size = new Vector3(TileSizecolumn * prefabSize, 0, TileSizeRow * prefabSize);
-
-                //콜라이더 위치 조절
-                //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
-                Cbox.center = new Vector3(((TileSizecolumn * prefabSize / 2) - (prefabSize / 2)),
-                    0,
-                    ((TileSizeRow * prefabSize / 2) - (prefabSize / 2)));
+                else // 0보다 작음으로 벽타일
+                {
+                    LoadCreateWallTile(LoadListMapData[i].row, LoadListMapData[i].x, LoadListMapData[i].y, LoadListMapData[i].z, LoadListMapData[i].rotation);
+                }
             }
         }  
         else
@@ -335,66 +277,68 @@ public class MapCreate : MonoBehaviour
       
     }
 
-    private void LoadMapCreate(GameObject _nodeName, string _name, List<string> _LoadLOLstr, List<GameObject> _PrefabList)
+    /// <summary>
+    /// 싱글 오브젝트 불러오기 및 생성
+    /// </summary>
+    private void LoadSingle(GameObject _nodeName, string _name, List<GameObject> _PrefabList)
     {
+        //3개의 정보를 다해야함
+        string JsonStr = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
+
+        //List<MapData>
+        List<MapData> LoadListMapData = JsonConvert.DeserializeObject<List<MapData>>(JsonStr);
+        MngLog.Instance.addLog(_nodeName.name + ": 제이슨 불러오기 완료");
+
         //LOL의 크기가 1개이상일때 동작
-        if (_LoadLOLstr != null && _LoadLOLstr.Count > 0)
+        if (LoadListMapData != null && LoadListMapData.Count > 0)
         {
-            //리스트의 길이만큼 하나하나를 만들어야함
-            for (int i = 0; i < _LoadLOLstr.Count; i++)//subObj의 개수만큼임 하고있음
+            //List<MapData>의 개수만큼 돔
+            for (int i = 0; i < LoadListMapData.Count; i++)//subObj의 개수만큼임 하고있음
             {
-                //subObj 생성 및 이름 할당
-                GameObject subObj = new GameObject(_name);
+                //Floor -> 상위 노드(this) -> 111
+                GameObject subDeco = new GameObject();
+                subDeco.transform.parent = deco.transform;
+                subDeco.name = "subDeco";
 
-                //부모 만들어주기 floor를 subObj의 부모로 
-                subObj.transform.parent = _nodeName.transform;
-                //데이터 부분 (제이슨을 다시 풀어줌)
-                List<MapData> tmp = JsonConvert.DeserializeObject<List<MapData>>(_LoadLOLstr[i]);
+                int foundIndex = -1;
 
-                for (int k = 0; k < tmp.Count; k++)//sub의 자식개수 만큼 반복문 도는 중
+                //(clone)문구 제거
+                string findString = LoadListMapData[i].prefabName.Substring(0, LoadListMapData[i].prefabName.Length - 7);
+                for (int j = 0; j < _PrefabList.Count; j++)
                 {
-                    //프리팹 찾기
-                    string prefabStringOrigin = tmp[k].prefabName;
-                    //(clone) 제거 
-                    string result = prefabStringOrigin.Substring(0, tmp[k].prefabName.Length - 7);
-
-                    int index = FindObjectInList(_PrefabList, result);
-                    //오브젝트 생성 및 부모!설정 이부분 바꿔야함
-                    GameObject obj = Instantiate(_PrefabList[index], subObj.transform);
-
-                    //pos 조정
-                    obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
-
-                    ////이름 설정
-                    //obj.name = tmp[k].prefabName;
-
-                    ////tag 태그
-                    //obj.transform.tag = tmp[k].tagName;
-
-                    ////layer 레이어
-                    //obj.layer = tmp[k].LayerNum;
+                    if(_PrefabList[j].name == findString)
+                    {
+                        foundIndex = j; // 일치하는 아이템의 인덱스를 저장하고
+                        break; // 더 이상 검색할 필요 없으므로 반복문 종료
+                    }
                 }
-                //콜라이더 만들기
-                subObj.AddComponent<BoxCollider>();
 
-                //콜라이더 가져오기
-                BoxCollider Cbox = subObj.GetComponent<BoxCollider>();
+                if (foundIndex != -1)
+                {
+                    // 일치하는 아이템의 인덱스를 사용하여 원하는 작업을 수행
+                    GameObject obj = Instantiate(_PrefabList[foundIndex], subDeco.transform);
+                    obj.name = _PrefabList[foundIndex].name;
+                }
+                else
+                {
+                    // 일치하는 아이템이 없을 경우
+                    Debug.Log("일치하는 아이템이 없음");
+                    MngLog.Instance.addLog("일치하는 아이템이 없어 생성하지 못했습니다");
+                }
 
-                //콜라이더 사이즈 조절
-                Cbox.size = new Vector3(TileSizecolumn * prefabSize, 0, TileSizeRow * prefabSize);
+                //sub 위치 설정
+                subDeco.transform.position = new Vector3(LoadListMapData[i].x, LoadListMapData[i].y, LoadListMapData[i].z);
 
-                //콜라이더 위치 조절
-                //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
-                Cbox.center = new Vector3(((TileSizecolumn * prefabSize / 2) - (prefabSize / 2)),
-                    0,
-                    ((TileSizeRow * prefabSize / 2) - (prefabSize / 2)));
+                //sub rotation 설정
+                //Debug.Log(LoadListMapData[i].rotation);
+                subDeco.transform.rotation = Quaternion.Euler(0f, LoadListMapData[i].rotation, 0f);
+
             }
-            
-
         }
         else
         {
-            Debug.Log(_name + ": " + "불러올 내용이 없습니다");
+            Debug.Log(_name + ": 불러올 내용이 없습니다");
+            MngLog.Instance.addLog(_name + ": 불러올 내용이 없습니다");
         }
 
     }
@@ -422,7 +366,7 @@ public class MapCreate : MonoBehaviour
     /// <summary>
     /// 입력한 가로 x 세로 만큼 타일을 만들어주는 메서드
     /// </summary>
-    public void BtnCreateFloorTile()
+    public void CreateFloorTile()
     {
         //InputField값 가져오기
         string tmp = InputRow.text;
@@ -513,7 +457,7 @@ public class MapCreate : MonoBehaviour
     /// <summary>
     /// 입력한 가로에따른 타일을 만들어주는 메서드
     /// </summary>
-    public void BtnCreateWallTile()
+    public void CreateWallTile()
     {
         //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
         MeshRenderer ren = objPrefabList_Wall[0].GetComponent<MeshRenderer>();
@@ -584,6 +528,141 @@ public class MapCreate : MonoBehaviour
         //Log
         MngLog.Instance.addLog(resultIntX + " x 1 크기의 wall을  생성했습니다.");
     }
+
+    public void LoadCreateFloorTile(int row, int col , float x, float y, float z, float rotation)
+    {
+        //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
+        MeshRenderer ren = objPrefabList_Floor[0].GetComponent<MeshRenderer>();
+        prefabSize = (int)ren.bounds.size.x;
+
+        //for문하나로 z값을 늘려주기위함
+        tempZ = 0;
+
+        //총깔아야하는 프리팹 수
+        totalPixel = row * col;
+
+        //Floor -> 상위 노드(this) -> 111
+        GameObject subFloor = new GameObject();
+        subFloor.transform.parent = floor.transform;
+        subFloor.name = "subFloor";
+
+        for (int i = 0; i < totalPixel; i++)
+        {
+            //z축으로 늘리기위함
+            if (i % col == 0)
+            {
+                tempZ += prefabSize;
+            }
+
+            //position 설정
+            Vector3 Vfloor = new Vector3(i * prefabSize - ((tempZ - prefabSize) * col), 0, tempZ - prefabSize);
+            //Debug.Log(Vfloor);
+
+            //오브젝트생성
+            GameObject obj = Instantiate(objPrefabList_Floor[Random.Range(0, objPrefabList_Floor.Count)], subFloor.transform);
+
+            //위치지정
+            obj.transform.position = Vfloor;
+
+            //오브젝트구분, 이름할당
+
+            obj.name = obj.name.ToString();
+
+            //태그 지정
+            obj.tag = "Ground";
+
+            //레이어 지정
+            obj.layer = 6;
+        }
+
+        //sub position 설정
+        subFloor.transform.position = new Vector3(x, y, z);
+
+        //sub rotation 설정
+        subFloor.transform.localEulerAngles = new Vector3(0f, rotation, 0f);
+
+        //콜라이더 만들기
+        subFloor.AddComponent<BoxCollider>();
+
+        //콜라이더 가져오기
+        BoxCollider Cbox = subFloor.GetComponent<BoxCollider>();
+
+        //콜라이더 사이즈 조절
+        Cbox.size = new Vector3(col * prefabSize, 0, row * prefabSize);
+
+        //콜라이더 위치 조절
+        //Cbox.transform.position = new Vector3(((TileSizeZ * prefabSize /2) -2), 0, TileSizeX * prefabSize);
+        Cbox.center = new Vector3(((col * prefabSize / 2) - (prefabSize / 2)),
+            0,
+            ((row * prefabSize / 2) - (prefabSize / 2)));
+
+        //Log
+        MngLog.Instance.addLog(row + " x " + col + " 크기의 floor를  생성했습니다.");
+
+    }
+
+    public void LoadCreateWallTile(int row, float x, float y, float z, float rotation)
+    {
+        //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
+        MeshRenderer ren = objPrefabList_Wall[0].GetComponent<MeshRenderer>();
+        prefabSize = (int)ren.bounds.size.x;
+        float sizeY = ren.bounds.size.y;
+        float sizeZ = ren.bounds.size.z;
+
+        //Floor -> 상위 노드(this) -> 111
+        GameObject subWall = new GameObject();
+
+        // subWall의 부모노드 설정
+        subWall.transform.parent = wall.transform;
+        subWall.name = "subWall";
+
+        //하위 오브젝트 생성
+        for (int i = 0; i < row; i++)
+        {
+            //position 설정
+            Vector3 Vwall = new Vector3(i * prefabSize, 0, 0);
+            Debug.Log(i +" :"+ Vwall);
+            
+            //오브젝트생성(랜덤)
+            GameObject obj = Instantiate(objPrefabList_Wall[Random.Range(0, objPrefabList_Wall.Count)], subWall.transform);
+
+            //obj 위치지정
+            obj.transform.position = Vwall;
+
+            //오브젝트구분 
+            obj.name = obj.name.ToString();
+
+            //태그 지정
+            obj.tag = "Wall";
+
+            //레이어 지정
+            obj.layer = 7;
+        }
+
+        //sub position 설정
+        subWall.transform.position = new Vector3(x, y, z);
+
+        //sub rotation 설정
+        subWall.transform.localEulerAngles = new Vector3(0f, rotation, 0f);
+
+        //콜라이더 만들기
+        subWall.AddComponent<BoxCollider>();
+
+        //콜라이더 가져오기
+        BoxCollider Cbox = subWall.GetComponent<BoxCollider>();
+
+        //콜라이더 사이즈 조절
+        Cbox.size = new Vector3(row * prefabSize, sizeY * 2.3f, sizeZ);
+
+        //콜라이더 위치 조절
+        Cbox.center = new Vector3(((row * prefabSize / 2) - (prefabSize / 2)),
+             (sizeY / prefabSize) + 2,
+             -(prefabSize / 2) - (sizeZ / 2));
+
+        //Log
+        MngLog.Instance.addLog( row + " x 1 크기의 wall을  생성했습니다.");
+    }
+
     #endregion
 
 

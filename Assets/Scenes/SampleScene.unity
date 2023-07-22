@@ -404,7 +404,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 673426928}
         m_TargetAssemblyTypeName: MapCreate, Assembly-CSharp
-        m_MethodName: BtnCreateWallTile
+        m_MethodName: CreateWallTile
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1615,7 +1615,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 673426928}
         m_TargetAssemblyTypeName: MapCreate, Assembly-CSharp
-        m_MethodName: BtnCreateFloorTile
+        m_MethodName: CreateFloorTile
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
