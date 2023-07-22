@@ -458,7 +458,8 @@ public class MapCreate : MonoBehaviour
         string tmp2 = InputColumn.text;
 
         //임시 int
-        int resultIntX, resultIntZ = 0;
+        int resultIntX = 1;
+        int resultIntZ = 1;
 
         int.TryParse(tmp, out resultIntX);
         int.TryParse(tmp2, out resultIntZ);
@@ -553,7 +554,7 @@ public class MapCreate : MonoBehaviour
         string tmp = InputRow.text;
 
         //임시 int
-        int resultIntX = 0;
+        int resultIntX = 1;
 
         int.TryParse(tmp, out resultIntX);
 
