@@ -13,17 +13,19 @@ using UnityEditor;
 [System.Serializable]
 public class MapData
 {
+    //subPosition
     public float x,y,z;
-    public int LayerNum = 6;
-    public string tagName = "";
-    public string prefabName = "";
-    
 
-    public void printData()
-    {
-        Debug.Log("TagName : " + tagName);
-        Debug.Log("LayerNum : " + LayerNum);
-    }
+    // name(0) , 싱글에서 사용
+    public string prefabName = "";
+
+    //멀티에서 사용
+    // 가로
+    public int row;
+
+    // 세로
+    public int col;
+
 }
 
 public class MapCreate : MonoBehaviour
@@ -53,33 +55,18 @@ public class MapCreate : MonoBehaviour
     public InputField InputRow;
     public InputField InputColumn;
     
-
+    //임시 데이터
     List<string> LoadLOLstr;
-
-
 
     private void Awake()
     {
         initData();
-
     }
-
-    void Start()
-    {
-        
-
-
-    }
-
-    void Update()
-    {
-
-    }
-
 
     #region testing
     private void test()
     {
+        //제이슨 저장 실험
         List<MapData> testList = new List<MapData>();
         List<MapData> testList2 = new List<MapData>();
         MapData data = new MapData();
@@ -170,28 +157,25 @@ public class MapCreate : MonoBehaviour
 
 
     }
+    
+    public void BtnSaveMap()
+    {
+        SaveObj(floor);
+        SaveObj(wall);
+        SaveObj(deco);
+    }
 
+    #region Save
     /// <summary>
     /// 1. 저장시 subOOO 을 모두 찾고 그 밑의 MapData들을 모두 리스트에 저장
     /// 2. 저장된 리스트를 제이슨화
     /// 3. 파일로 저장
     /// </summary>
-    public void BtnSaveMap()
+    private void SaveObj(GameObject _nodeName)
     {
-        SaveObj(floor, LoadLOLstr);
-        SaveObj(wall, LoadLOLstr);
-        SaveObj(deco, LoadLOLstr);
-    }
+        //저장전 초기화
+        LoadLOLstr.Clear();
 
-    #region Save
-    //overloading
-    /// <summary>
-    /// subObject를 구분해서 만들어 주고 그 밑에 데이터를 넣음
-    /// </summary>
-    /// <param name="_nodeName"></param>
-    private void SaveObj(GameObject _nodeName, List<string> _ListOfListStr)
-    {
-        _ListOfListStr.Clear();
         // _nodeName == floor임
         // sub의 개수 
         int subCount = _nodeName.transform.childCount;
@@ -199,56 +183,56 @@ public class MapCreate : MonoBehaviour
 
         if (subCount > 0) //sub의개수가 1개이상일때 작동
         {
-            //floor 들의 정보를 담을 리스트 추후 제이슨으로 변환예정
+            //MapData담을 임시그릇 제이슨화 해야함
+            List<MapData> tempList = new List<MapData>();
 
+            //floor 들의 정보를 담을 리스트 추후 제이슨으로 변환예정
             for (int i = 0; i < subCount; i++)
             {
-                //MapData담을 임시그릇 제이슨화 해야함
-                List<MapData> tempList = new List<MapData>(); 
-
                 //subobj들 가져옴
-                Transform subTransform = _nodeName.transform.GetChild(i);
-                GameObject subObject = subTransform.gameObject;
+                GameObject subObject = _nodeName.transform.GetChild(i).gameObject;
 
-                int objectCount = subObject.transform.childCount;
+                //저장 형식 생성
+                MapData data = new MapData();
 
-                //floor 들의 갯수
-                if (objectCount > 0)
+                //sub 포지션 저장
+                data.x = subObject.transform.position.x;
+                data.y = subObject.transform.position.y;
+                data.z = subObject.transform.position.z;
+
+                //가로 세로 저장(콜라이더 크기 사용
+                //콜라이더 가져오기
+                BoxCollider collider = subObject.GetComponent<BoxCollider>();
+
+                if(collider != null)
                 {
-                    for (int k = 0; k < objectCount; k++)
-                    {
-                        Transform objTransform = subObject.transform.GetChild(k);
-                        GameObject Object = objTransform.gameObject;
-
-                        //담을 데이터 생성
-                        MapData data = new MapData();
-
-                        data.x = Object.transform.position.x;
-                        data.y = Object.transform.position.y;
-                        data.z = Object.transform.position.z;
-
-                        data.prefabName = Object.name;
-                        data.tagName = Object.transform.tag;
-                        data.LayerNum = Object.layer;
-
-                        //제이슨 변환용 리스트에 담기
-                        tempList.Add(data);
-
-                    }
+                    //4는 프리팹들의 기본사이즈임 좀더 정확하게하려면 list의 render를 가져와서 사이즈를 측정해야함
+                    //가로
+                    data.row = (int)(collider.size.x / 4);
+                    //세로
+                    data.col = (int)(collider.size.z / 4);
                 }
-                string tmp = JsonConvert.SerializeObject(tempList);
 
-                //제이슨 문자열이 담긴 string tmp를 리스트에 저장함
-                _ListOfListStr.Add(tmp);
+                //이름  저장(싱글)
+                data.prefabName = subObject.transform.GetChild(0).name;
+
+                //리스트에 넣기
+                tempList.Add(data);
             }
 
+            //List<MapData> templist 제이슨화
+            string tmp = JsonConvert.SerializeObject(tempList);
+
+            //제이슨 문자열(tmp)을 List<string>에 저장함
+            LoadLOLstr.Add(tmp);
+
             //제이슨 문자열이 담긴 List str을 이중 제이슨 저장
-            string str = JsonConvert.SerializeObject(_ListOfListStr);
+            string str = JsonConvert.SerializeObject(LoadLOLstr);
             //파일 저장
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
             MngLog.Instance.addLog(_nodeName + "이 저장되었습니다");
         }
-        else //아무것도없을때 저장하면 제이슨을 초기화함
+        else //저장시 sub노드가 없으면 아무것도 없는 빈문자열로 저장된 데이터를 초기화함
         {
             string str = null;
             File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
@@ -257,28 +241,15 @@ public class MapCreate : MonoBehaviour
     }
     #endregion
 
-    /// <summary>
-    /// 리스트에 추가 및 MapData 포지션 할당
-    /// </summary>
-    /// <param name="_List"> mapFloor,mapWall,mapDeco</param>
-    /// <param name="_FWD">Floor, Wall, Deco</param>
     public void BtnLoadMap()
     {
-        LoadMapRandom(floor, "subFloor", objPrefabList_Floor);
-        LoadMapRandom(wall, "subWall", objPrefabList_Wall);
-        LoadMap(deco, "subDeco", objPrefabList_Deco);
+        //LoadMapRandom(floor, "subFloor", objPrefabList_Floor);
+        //LoadMapRandom(wall, "subWall", objPrefabList_Wall);
+        //LoadMap(deco, "subDeco", objPrefabList_Deco);
     }
 
     #region Load
-    /// <summary>
-    /// 해당경로에 해당하는 리스트를 반환함(없으면 빈리스트를 반환)
-    /// 0. 스타트시 일단 한번 실행
-    /// 1. 제이슨데이터 파일를 가져와 역직렬화
-    /// 2. 리스트로 다시 가져오고 
-    /// 3. 리스트의 길이만큼 반복문을 돌면서 위치에 맞춰 오브젝트를 생성
-    /// 4. 태그와 레이어 조정
-    /// </summary>
-    /// <returns></returns>
+ 
     private void LoadMapRandom(GameObject _nodeName, string _name, List<GameObject> _PrefabList)
     { 
         //3개의 정보를 다해야함
@@ -331,14 +302,14 @@ public class MapCreate : MonoBehaviour
 
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
 
-                    //이름 설정
-                    obj.name = tmp[k].prefabName;
+                    ////이름 설정
+                    //obj.name = tmp[k].prefabName;
 
-                    //tag 태그
-                    obj.transform.tag = tmp[k].tagName;
+                    ////tag 태그
+                    //obj.transform.tag = tmp[k].tagName;
 
-                    //layer 레이어
-                    obj.layer = tmp[k].LayerNum;
+                    ////layer 레이어
+                    //obj.layer = tmp[k].LayerNum;
                 }
                 //콜라이더 만들기
                 subObj.AddComponent<BoxCollider>();
@@ -394,14 +365,14 @@ public class MapCreate : MonoBehaviour
                     //pos 조정
                     obj.transform.position = new Vector3(tmp[k].x, tmp[k].y, tmp[k].z);
 
-                    //이름 설정
-                    obj.name = tmp[k].prefabName;
+                    ////이름 설정
+                    //obj.name = tmp[k].prefabName;
 
-                    //tag 태그
-                    obj.transform.tag = tmp[k].tagName;
+                    ////tag 태그
+                    //obj.transform.tag = tmp[k].tagName;
 
-                    //layer 레이어
-                    obj.layer = tmp[k].LayerNum;
+                    ////layer 레이어
+                    //obj.layer = tmp[k].LayerNum;
                 }
                 //콜라이더 만들기
                 subObj.AddComponent<BoxCollider>();
@@ -467,8 +438,8 @@ public class MapCreate : MonoBehaviour
         //값확인
         if(resultIntX > 0 && resultIntZ > 0)
         {
-            TileSizeRow = resultIntX;
-            TileSizecolumn = resultIntZ;
+            TileSizeRow = resultIntZ;
+            TileSizecolumn = resultIntX;
         }
 
         //프리팹이 차지하는 크기만큼 포지션을 옮겨야하기때문에 프리팹 사이즈를 측정하기위함
