@@ -169,6 +169,7 @@ public class MapCreate : MonoBehaviour
     /// </summary>
     private void SaveObj(GameObject _nodeName)
     {
+        
         // _nodeName == floor임
         // sub의 개수 
         int subCount = _nodeName.transform.childCount;
@@ -218,14 +219,27 @@ public class MapCreate : MonoBehaviour
             //List<MapData> templist 제이슨화
             string tmp = JsonConvert.SerializeObject(tempList);
 
+
             //파일 저장
-            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", tmp);
+            //File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", tmp);
+            string directory = Path.GetDirectoryName(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
+            if (!Directory.Exists(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json"))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            File.WriteAllText(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json", tmp);
             MngLog.Instance.addLog(_nodeName + "이 저장되었습니다");
+            Debug.Log("저장경로 : "+ Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
         }
         else //저장시 sub노드가 없으면 아무것도 없는 빈문자열로 저장된 데이터를 초기화함
         {
             string str = null;
-            File.WriteAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
+            string directory = Path.GetDirectoryName(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
+            if (!Directory.Exists(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json"))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            File.WriteAllText(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json", str);
             MngLog.Instance.addLog(_nodeName + "저장할 오브젝트가 없습니다");
         }
     }
@@ -245,8 +259,13 @@ public class MapCreate : MonoBehaviour
     /// </summary>
     private void LoadMulti_Random(GameObject _nodeName, string _name, List<GameObject> _PrefabList) 
     {
+        string directory = Path.GetDirectoryName(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
+        if (!Directory.Exists(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json"))
+        {
+            Directory.CreateDirectory(directory);
+        }
         //3개의 정보를 다해야함
-        string JsonStr = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
+        string JsonStr = File.ReadAllText(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
 
         //List<MapData>
         List<MapData> LoadListMapData = JsonConvert.DeserializeObject<List<MapData>>(JsonStr);
@@ -277,13 +296,23 @@ public class MapCreate : MonoBehaviour
       
     }
 
+    private void savePath()
+    {
+
+    }
+
     /// <summary>
     /// 싱글 오브젝트 불러오기 및 생성
     /// </summary>
     private void LoadSingle(GameObject _nodeName, string _name, List<GameObject> _PrefabList)
     {
+        string directory = Path.GetDirectoryName(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
+        if (!Directory.Exists(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json"))
+        {
+            Directory.CreateDirectory(directory);
+        }
         //3개의 정보를 다해야함
-        string JsonStr = File.ReadAllText(Application.dataPath + "/MapJsonFolder/" + _nodeName + ".json");
+        string JsonStr = File.ReadAllText(Application.persistentDataPath + "/MapJsonFolder/" + _nodeName + ".json");
 
         //List<MapData>
         List<MapData> LoadListMapData = JsonConvert.DeserializeObject<List<MapData>>(JsonStr);
