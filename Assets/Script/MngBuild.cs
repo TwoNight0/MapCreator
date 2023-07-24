@@ -58,8 +58,8 @@ public class MngBuild : MonoBehaviour
         //getPrefabTexture(ListDeco, Deco);
 
         //버튼생성
-        createPrefabButton(ListWall);
-        createPrefabButton(ListDeco);
+        createPrefabButton(ListWall, "Wall/");
+        createPrefabButton(ListDeco, "Deco/");
 
         //리스트에 버튼의 게임오브젝트 넣기
         btnListAdd();
@@ -225,35 +225,35 @@ public class MngBuild : MonoBehaviour
     /// 프리팹에서 이미지 뽑아오는 함수
     /// </summary>
     /// <param name="_List"></param>
-    private void getPrefabTexture(List<GameObject> _List, string _FolderName)
-    {
-        if(_List == null)
-        {
-            return;
-        }
+    //private void getPrefabTexture(List<GameObject> _List, string _FolderName)
+    //{
+    //    if(_List == null)
+    //    {
+    //        return;
+    //    }
 
-        int count = _List.Count;
-        for (int i = 0; i< count; i++)
-        {
-            Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
+    //    int count = _List.Count;
+    //    for (int i = 0; i< count; i++)
+    //    {
+    //        //Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
 
-            if(tmpTexture2D != null)
-            {
-                byte[] texturePNGBytes = tmpTexture2D.EncodeToPNG();
-                //Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
-                File.WriteAllBytes(Application.dataPath + "/PrefabImgFolder/" + _FolderName + "/"+ + i + ".png", texturePNGBytes);
-            }
+    //        if(tmpTexture2D != null)
+    //        {
+    //            byte[] texturePNGBytes = tmpTexture2D.EncodeToPNG();
+    //            //Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
+    //            File.WriteAllBytes(Application.dataPath + "/PrefabImgFolder/" + _FolderName + "/"+ + i + ".png", texturePNGBytes);
+    //        }
 
 
-        }
-    }
+    //    }
+    //}
 
     //시작할때 쓰는기능 처음만 불러오고 나중에는 SetActive 처리하자
     //자동으로 addlistener를 넣어주는 기능을 만들어야해 (right의 image 밑에!)
     // 버튼 이미지,
     // 눌렀을때 마우스 끝에 있게 만드는기능
     //프리팹의 이미지를 가져오고 하드디스크에 이미지를 저장?
-    private void createPrefabButton(List<GameObject> _List)
+    private void createPrefabButton(List<GameObject> _List , string _Folder)
     {
         if (_List == null)
         {
@@ -263,9 +263,13 @@ public class MngBuild : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             //여기에 고질적인 문제가있음 처음 에셋 프리뷰실행하면 null이뜸;
-            Texture2D tmpTexture2D = AssetPreview.GetAssetPreview(_List[i]);
+            //Texture2D tempSprite = AssetPreview.GetAssetPreview(_List[i]);
 
-            if (tmpTexture2D != null)
+            Sprite tempSprite = Resources.Load<Sprite>(_Folder + i);
+
+
+
+            if (tempSprite != null)
             {
                 //버튼생성
                 GameObject btnObj = new GameObject();
@@ -292,8 +296,8 @@ public class MngBuild : MonoBehaviour
                 
 
                 //스프라이트 생성 및 할당
-                Sprite mySprite = Sprite.Create(tmpTexture2D, new Rect(0.0f, 0.0f, tmpTexture2D.width, tmpTexture2D.height), new Vector2(0.5f, 0.5f), 100.0f);
-                Imgtmp.sprite = mySprite;
+                //Sprite mySprite = Sprite.Create(tempSprite, new Rect(0.0f, 0.0f, tempSprite.width, tempSprite.height), new Vector2(0.5f, 0.5f), 100.0f);
+                Imgtmp.sprite = tempSprite;
             }
         }
     }
